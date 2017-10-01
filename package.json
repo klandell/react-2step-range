@@ -1,0 +1,12 @@
+{
+  "name": "react-timeline-slider",
+  "version": "1.0.0",
+  "description": "A responsive cross browser replacement for the input range HTML element",
+  "main": "dist/index.js",
+  "author": "Kyle Landell",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^3.6.0"
+  }
+}
