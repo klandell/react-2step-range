@@ -50,6 +50,7 @@ export default class FineIncrement extends PureComponent {
         super(props);
         this.state = {
             activeTrackStyle: {},
+            fineIncrementStyle: {},
             trackStyle: {},
             thumbContainerStyle: {},
             thumbStyle: {},
@@ -72,7 +73,7 @@ export default class FineIncrement extends PureComponent {
             activeTrackStyle: this.calculateActiveTrackStyle(props, position),
             fineIncrementStyle: this.calculateFineIncrementStyle(props),
             trackStyle: this.calculateTrackStyle(props),
-            thumbContainerStyle: this.calculateThumbContainerStyle(props),
+            thumbContainerStyle: this.calculateThumbContainerStyle(props), // TODO: allow this to be updated
             thumbStyle: this.calculateThumbStyle(props),
             // TODO: allow this to be updated
             values: new Array((max - min) + 1).fill().map((d, i) => i + min),
@@ -126,6 +127,7 @@ export default class FineIncrement extends PureComponent {
         }
     }
 
+    // TODO: pull this to util function
     diff(lastProps, nextProps, keys = []) {
         for (let i = 0; i < keys.length; i++) {
             const key = keys[i];
@@ -168,12 +170,12 @@ export default class FineIncrement extends PureComponent {
         };
     }
 
-    calculateThumbContainerStyle({ thumbDiameter }) {
+    calculateThumbContainerStyle({ thumbDiameter, thumbBorderWidth }) {
         return {
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
-            bottom: thumbDiameter / 2,
+            bottom: (thumbDiameter + (thumbBorderWidth * 2)) / 2,
             flexShrink: 0,
         };
     }
@@ -187,7 +189,7 @@ export default class FineIncrement extends PureComponent {
             borderRadius: '50%',
             flexGrow: 0,
             position: 'relative',
-            right: thumbDiameter / 2,
+            right: (thumbDiameter + (thumbBorderWidth * 2)) / 2,
         };
     }
 
@@ -316,12 +318,18 @@ export default class FineIncrement extends PureComponent {
     }
 
     renderTicks() {
-        const { children } = this.props;
+        const { children, thumbBorderWidth, thumbDiameter, trackPadding, trackLength } = this.props;
         const ticks = this.findChildrenByType(children, 'Ticks');
 
         let ret;
         if (ticks.length) {
-            ret = cloneElement(ticks.slice(-1)[0], { _onTickClick: this.onTickClick });
+            ret = cloneElement(ticks.slice(-1)[0], {
+                _onTickClick: this.onTickClick,
+                _thumbBorderWidth: thumbBorderWidth,
+                _thumbDiameter: thumbDiameter,
+                _trackPadding: trackPadding,
+                _trackLength: trackLength,
+            });
         }
         return ret;
     }
