@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, shape, string } from 'prop-types';
 
 const baseCls = 'fine-increment';
@@ -53,6 +53,7 @@ export default class FineIncrement extends PureComponent {
             trackStyle: {},
             thumbContainerStyle: {},
             thumbStyle: {},
+            values: [],
             stops: [],
             value: null,
         };
@@ -141,12 +142,13 @@ export default class FineIncrement extends PureComponent {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
+            cursor: 'pointer',
         };
     }
 
     calculateActiveTrackStyle({ activeTrackColor, trackColor, trackWidth, trackPadding }, position) {
         return {
-            width: position,
+            width: position - trackPadding.left,
             flexGrow: 0,
             backgroundColor: activeTrackColor || trackColor,
             height: trackWidth,
@@ -162,6 +164,7 @@ export default class FineIncrement extends PureComponent {
             paddingLeft: trackPadding.left,
             paddingRight: trackPadding.right,
             boxSizing: 'border-box',
+            flexShrink: 0,
         };
     }
 
@@ -171,6 +174,7 @@ export default class FineIncrement extends PureComponent {
             display: 'flex',
             alignItems: 'center',
             bottom: thumbDiameter / 2,
+            flexShrink: 0,
         };
     }
 
@@ -293,6 +297,35 @@ export default class FineIncrement extends PureComponent {
         }
     }
 
+    findChildrenByType(children, type) {
+        const ret = [];
+        Children.forEach(children, (child) => {
+            const childType = child && child.type && (child.type.displayName || child.type.name);
+            if (childType === type) {
+                ret.push(child);
+            }
+        });
+        return ret;
+    }
+
+    onTickClick = (idx) => {
+        this.setState((state, props) => ({
+            value: state.values[idx],
+            activeTrackStyle: this.calculateActiveTrackStyle(props, state.stops[idx]),
+        }));
+    }
+
+    renderTicks() {
+        const { children } = this.props;
+        const ticks = this.findChildrenByType(children, 'Ticks');
+
+        let ret;
+        if (ticks.length) {
+            ret = cloneElement(ticks.slice(-1)[0], { _onTickClick: this.onTickClick });
+        }
+        return ret;
+    }
+
     render() {
         const { cls } = this.props;
         const {
@@ -329,6 +362,7 @@ export default class FineIncrement extends PureComponent {
                       style={thumbStyle}
                     />
                 </div>
+                {this.renderTicks()}
             </div>
         );
     }
