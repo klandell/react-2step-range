@@ -19,7 +19,7 @@ export default class Ticks extends PureComponent {
             right: number,
         }).isRequired, // @private use only
         _trackLength: number.isRequired, // @private use only
-        labelFontSize: oneOf(number, string),
+        labelFontSize: oneOf([number, string]),
         onTickClick: func,
         tickColor: string,
         tickDiameter: number,

@@ -9,6 +9,14 @@ const thumbStyleProps = ['thumbBorderColor', 'thumbBorderWidth', 'thumbColor', '
 const stopPositionProps = ['max', 'min', 'step', 'trackLength', 'trackPadding'];
 const valueProps = ['value'];
 
+const styles = {
+    fineIncrementStyle: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+};
+
 export default class FineIncrement extends PureComponent {
     static propTypes = {
         activeTrackColor: string,
@@ -50,7 +58,7 @@ export default class FineIncrement extends PureComponent {
         super(props);
         this.state = {
             activeTrackStyle: {},
-            fineIncrementStyle: {},
+            fineIncrementStyle: {}, // TODO: rename these
             trackStyle: {},
             thumbContainerStyle: {},
             thumbStyle: {},
@@ -138,9 +146,9 @@ export default class FineIncrement extends PureComponent {
         return false;
     }
 
-    calculateFineIncrementStyle({ thumbDiameter }) {
+    calculateFineIncrementStyle({ trackWidth }) {
         return {
-            height: thumbDiameter * 3,
+            height: trackWidth,
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -175,7 +183,7 @@ export default class FineIncrement extends PureComponent {
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
-            bottom: (thumbDiameter + (thumbBorderWidth * 2)) / 2,
+            bottom: Math.ceil((thumbDiameter + (thumbBorderWidth * 2)) / 2),
             flexShrink: 0,
         };
     }
@@ -189,7 +197,7 @@ export default class FineIncrement extends PureComponent {
             borderRadius: '50%',
             flexGrow: 0,
             position: 'relative',
-            right: (thumbDiameter + (thumbBorderWidth * 2)) / 2,
+            right: Math.ceil((thumbDiameter + (thumbBorderWidth * 2)) / 2),
         };
     }
 
@@ -255,7 +263,7 @@ export default class FineIncrement extends PureComponent {
 
     onThumbContainerClick = ({ clientX, currentTarget }) => {
         // TODO: break this into a function too!!
-        const clickLocation = clientX - currentTarget.getBoundingClientRect().left;
+        const clickLocation = (clientX - currentTarget.getBoundingClientRect().left);
         this.setState((state, props) => {
             const value = this.calculateValueFromPosition(state, clickLocation);
 
@@ -280,10 +288,11 @@ export default class FineIncrement extends PureComponent {
         this.isSlidable = false;
     }
 
-    onThumbContainerMouseMove = ({ clientX, currentTarget }) => {
-        // TODO: combine with onThumbContainerClick fn
+    onThumbContainerMouseMove = ({ clientX }) => {
+        // TODO: combine with onThumbContainerClick fn?
+        // TODO: move this event to the window instead?
         if (this.isSlidable) {
-            const mouseLocation = clientX - currentTarget.getBoundingClientRect().left;
+            const mouseLocation = clientX - this.thumbContainer.getBoundingClientRect().left;
             this.setState((state, props) => {
                 const value = this.calculateValueFromPosition(state, mouseLocation);
 
@@ -317,6 +326,54 @@ export default class FineIncrement extends PureComponent {
         }));
     }
 
+    onMinusIconClick = () => {
+        this.setState((state, props) => {
+            const value = Math.max(props.min, state.value - 1);
+            const position = this.calculatePositionFromValue(props, state.stops, value);
+            return {
+                value,
+                activeTrackStyle: this.calculateActiveTrackStyle(props, position),
+            };
+        });
+    }
+
+    onPlusIconClick = () => {
+        this.setState((state, props) => {
+            const value = Math.min(props.max, state.value + 1);
+            const position = this.calculatePositionFromValue(props, state.stops, value);
+            return {
+                value,
+                activeTrackStyle: this.calculateActiveTrackStyle(props, position),
+            };
+        });
+    }
+
+    renderMinusIcon() {
+        const { children } = this.props;
+        const minusIcon = this.findChildrenByType(children, 'MinusIcon');
+
+        let ret;
+        if (minusIcon.length) {
+            ret = cloneElement(minusIcon.slice(-1)[0], {
+                _onClick: this.onMinusIconClick,
+            });
+        }
+        return ret;
+    }
+
+    renderPlusIcon() {
+        const { children } = this.props;
+        const plusIcon = this.findChildrenByType(children, 'PlusIcon');
+
+        let ret;
+        if (plusIcon.length) {
+            ret = cloneElement(plusIcon.slice(-1)[0], {
+                _onClick: this.onPlusIconClick,
+            });
+        }
+        return ret;
+    }
+
     renderTicks() {
         const { children, thumbBorderWidth, thumbDiameter, trackPadding, trackLength } = this.props;
         const ticks = this.findChildrenByType(children, 'Ticks');
@@ -347,30 +404,35 @@ export default class FineIncrement extends PureComponent {
         return (
             <div
               className={`${baseCls} ${cls}`}
-              style={fineIncrementStyle}
+              style={styles.fineIncrementStyle}
               onMouseMove={this.onThumbContainerMouseMove}
             >
-                <div
-                  className={`${baseCls}_track`}
-                  style={trackStyle}
-                />
-                <div
-                  className={`${baseCls}_thumb-container`}
-                  style={thumbContainerStyle}
-                  onClick={this.onThumbContainerClick}
-                  onMouseDown={this.onThumbContainerMouseDown}
-                  onMouseUp={this.onThumbContainerMouseUp}
-                >
+                {this.renderMinusIcon()}
+                <div style={fineIncrementStyle}>
                     <div
-                      className={`${baseCls}_active-track`}
-                      style={activeTrackStyle}
+                      className={`${baseCls}_track`}
+                      style={trackStyle}
                     />
                     <div
-                      className={`${baseCls}_thumb`}
-                      style={thumbStyle}
-                    />
+                      className={`${baseCls}_thumb-container`}
+                      style={thumbContainerStyle}
+                      onClick={this.onThumbContainerClick}
+                      onMouseDown={this.onThumbContainerMouseDown}
+                      onMouseUp={this.onThumbContainerMouseUp}
+                      ref={(c) => { this.thumbContainer = c; }}
+                    >
+                        <div
+                          className={`${baseCls}_active-track`}
+                          style={activeTrackStyle}
+                        />
+                        <div
+                          className={`${baseCls}_thumb`}
+                          style={thumbStyle}
+                        />
+                    </div>
+                    {this.renderTicks()}
                 </div>
-                {this.renderTicks()}
+                {this.renderPlusIcon()}
             </div>
         );
     }
