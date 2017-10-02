@@ -1,5 +1,5 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
-import { number, object } from 'prop-types';
+import { func, number, object } from 'prop-types';
 
 const styles = {
     coarseIncrement: {
@@ -9,20 +9,22 @@ const styles = {
     },
 };
 
-const valueProps = ['value'];
+const valueProps = ['_value'];
 
 export default class CoarseIncrement extends PureComponent {
     static propTypes = {
+        _onChange: func, // @private use only
+        _value: number, // TODO: allow categories?
         step: number,
-        value: number, // TODO: allow categories
         valueStyle: object,
         min: number,
         max: number,
     }
 
     static defaultProps = {
+        _onChange: () => {},
+        _value: 0,
         step: 1,
-        value: 0,
         min: Number.MIN_SAFE_INTEGER,
         max: Number.MAX_SAFE_INTEGER,
     }
@@ -57,6 +59,14 @@ export default class CoarseIncrement extends PureComponent {
         }
     }
 
+    componentWillUpdate(nextProps, nextState) {
+        const { value } = this.state;
+
+        if (value !== nextState.value && nextState.value !== nextProps._value) {
+            nextProps._onChange(nextState.value);
+        }
+    }
+
     // TODO: pull this to util function
     diff(lastProps, nextProps, keys = []) {
         for (let i = 0; i < keys.length; i++) {
@@ -68,14 +78,14 @@ export default class CoarseIncrement extends PureComponent {
         return false;
     }
 
-    calculateValue({ value, max, min }) {
-        let val = value;
+    calculateValue({ _value, max, min }) {
+        let val = _value;
 
-        if (value === null) {
+        if (_value === null) {
             val = min + ((max - min) / 2);
-        } else if (value < min) {
+        } else if (_value < min) {
             val = min;
-        } else if (value > max) {
+        } else if (_value > max) {
             val = max;
         }
         return val;

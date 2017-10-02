@@ -7,7 +7,7 @@ const fineIncrementStyleProps = ['thumbDiameter'];
 const trackStyleProps = ['trackWidth', 'height', 'lineColor', 'padding'];
 const thumbStyleProps = ['thumbBorderColor', 'thumbBorderWidth', 'thumbColor', 'thumbRadius'];
 const stopPositionProps = ['max', 'min', 'step', 'trackLength', 'trackPadding'];
-const valueProps = ['value'];
+const valueProps = ['_value'];
 
 const styles = {
     fineIncrementStyle: {
@@ -19,6 +19,8 @@ const styles = {
 
 export default class FineIncrement extends PureComponent {
     static propTypes = {
+        _onChange: func, // @private use only
+        _value: number, // @private use only
         activeTrackColor: string,
         cls: string,
         min: number.isRequired,
@@ -36,10 +38,11 @@ export default class FineIncrement extends PureComponent {
             left: number,
             right: number,
         }),
-        value: number,
     }
 
     static defaultProps = {
+        _onChange: () => {},
+        _value: null,
         cls: '',
         onChange: () => {},
         step: 1,
@@ -51,7 +54,6 @@ export default class FineIncrement extends PureComponent {
         activeTrackColor: null,
         trackColor: '#000',
         trackPadding: { left: 0, right: 0 },
-        value: null,
     }
 
     constructor(props) {
@@ -126,12 +128,20 @@ export default class FineIncrement extends PureComponent {
 
         if (this.diff(lastProps, nextProps, [...activeTrackStyleProps, ...stopPositionProps, ...valueProps])) {
             Object.assign(newState, {
-                activeTrackStyle: this.calculateTrackStyle(nextProps, this.calculatePositionFromValue(nextProps, stops, value)),
+                activeTrackStyle: this.calculateActiveTrackStyle(nextProps, this.calculatePositionFromValue(nextProps, stops, value)),
             });
         }
 
         if (Object.keys(newState).length) {
             this.setState(newState);
+        }
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        const { value } = this.state;
+
+        if (value !== nextState.value && nextState.value !== nextProps._value) {
+            nextProps._onChange(nextState.value);
         }
     }
 
@@ -218,14 +228,14 @@ export default class FineIncrement extends PureComponent {
         return stops;
     }
 
-    calculateValue({ value, max, min }) {
-        let val = value;
+    calculateValue({ _value, max, min }) {
+        let val = _value;
 
-        if (value === null) {
+        if (_value === null) {
             val = min + ((max - min) / 2);
-        } else if (value < min) {
+        } else if (_value < min) {
             val = min;
-        } else if (value > max) {
+        } else if (_value > max) {
             val = max;
         }
         return val;
@@ -367,7 +377,7 @@ export default class FineIncrement extends PureComponent {
             const position = this.calculatePositionFromValue(props, state.stops, value);
             return {
                 value,
-                activeTrackStyle: this.calculateActiveTrackStyle(props, position),
+                activeTrackStyle: this.calculateActiveTrackStyle(props, position), // TODO: I think I can get rid of all of these
             };
         });
     }

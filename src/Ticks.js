@@ -1,5 +1,5 @@
 import React, { Children, PureComponent } from 'react';
-import { func, number, oneOf, shape, string } from 'prop-types';
+import { func, number, oneOfType, shape, string } from 'prop-types';
 
 const baseCls = 'fine-increment_ticks';
 
@@ -19,7 +19,7 @@ export default class Ticks extends PureComponent {
             right: number,
         }).isRequired, // @private use only
         _trackLength: number.isRequired, // @private use only
-        labelFontSize: oneOf([number, string]),
+        labelFontSize: oneOfType([number, string]),
         onTickClick: func,
         tickColor: string,
         tickDiameter: number,
