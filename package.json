@@ -1,6 +1,6 @@
 {
   "name": "react-2step-range",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A highly customizable replacement for the HTML range input with two levels of adjustment granularity",
   "main": "dist/index.js",
   "dependencies": {

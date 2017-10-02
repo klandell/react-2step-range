@@ -73,7 +73,7 @@ export default class FineIncrement extends PureComponent {
 
     componentWillMount() {
         const { props } = this;
-        const { min, max } = props;
+        const { min, max, step } = props;
 
         const value = this.calculateValue(props);
         const stops = this.calculateStopPositions(props);
@@ -86,7 +86,7 @@ export default class FineIncrement extends PureComponent {
             thumbContainerStyle: this.calculateThumbContainerStyle(props), // TODO: allow this to be updated
             thumbStyle: this.calculateThumbStyle(props),
             // TODO: allow this to be updated
-            values: new Array((max - min) + 1).fill().map((d, i) => i + min), // TODO: use step in calc
+            values: new Array(Math.floor(((max - min) + 1) / step).fill().map((d, i) => (i * step) + min), // TODO: use step in calc
             stops,
             value,
         });
@@ -241,8 +241,8 @@ export default class FineIncrement extends PureComponent {
         return val;
     }
 
-    calculatePositionFromValue({ min, max }, stops, value) {
-        const values = new Array((max - min) + 1).fill().map((d, i) => i + min); // TODO: use state
+    calculatePositionFromValue({ min, max, step }, stops, value) {
+        const values = new Array(Math.floor(((max - min) + 1) / step).fill().map((d, i) => (i * step) + min); // TODO: use state
         const val = value === null ? this.state.value : value;
 
         let valueIdx;
