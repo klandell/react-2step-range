@@ -1,5 +1,6 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, shape, string } from 'prop-types';
+import { MinusIcon, PlusIcon, Ticks } from './';
 
 const baseCls = 'fine-increment';
 const activeTrackStyleProps = ['activeTrackColor', 'trackColor', 'trackWidth'];
@@ -342,7 +343,12 @@ export default class FineIncrement extends PureComponent {
         }
     }
 
-    findChildrenByType(children, type) {
+    getDisplayName(cmp) {
+        return cmp.displayName || cmp.name;
+    }
+
+    findChildrenByType(children, cmp) {
+        const type = this.getDisplayName(cmp);
         const ret = [];
         Children.forEach(children, (child) => {
             const childType = child && child.type && (child.type.displayName || child.type.name);
@@ -384,7 +390,7 @@ export default class FineIncrement extends PureComponent {
 
     renderMinusIcon() {
         const { children } = this.props;
-        const minusIcon = this.findChildrenByType(children, 'MinusIcon');
+        const minusIcon = this.findChildrenByType(children, MinusIcon);
 
         let ret;
         if (minusIcon.length) {
@@ -397,7 +403,7 @@ export default class FineIncrement extends PureComponent {
 
     renderPlusIcon() {
         const { children } = this.props;
-        const plusIcon = this.findChildrenByType(children, 'PlusIcon');
+        const plusIcon = this.findChildrenByType(children, PlusIcon);
 
         let ret;
         if (plusIcon.length) {
@@ -410,7 +416,7 @@ export default class FineIncrement extends PureComponent {
 
     renderTicks() {
         const { children, thumbBorderWidth, thumbDiameter, trackPadding, trackLength } = this.props;
-        const ticks = this.findChildrenByType(children, 'Ticks');
+        const ticks = this.findChildrenByType(children, Ticks);
 
         let ret;
         if (ticks.length) {
