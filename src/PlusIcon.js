@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { func, number, object, string } from 'prop-types';
+import { shallowDiff } from './Utils';
 
 const styleProps = ['style'];
 
@@ -37,7 +38,7 @@ export default class PlusIcon extends PureComponent {
         const lastProps = this.props;
         const newState = {};
 
-        if (this.diff(lastProps, nextProps, styleProps)) {
+        if (shallowDiff(lastProps, nextProps, styleProps)) {
             Object.assign(newState, {
                 style: this.calculateStyle(nextProps),
             });
@@ -46,17 +47,6 @@ export default class PlusIcon extends PureComponent {
         if (Object.keys(newState).length) {
             this.setState(newState);
         }
-    }
-
-    // TODO: pull this to util function
-    diff(lastProps, nextProps, keys = []) {
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            if (lastProps[key] !== nextProps[key]) {
-                return true;
-            }
-        }
-        return false;
     }
 
     calculateStyle({ style }) {

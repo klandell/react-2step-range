@@ -1,5 +1,6 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, shape, string } from 'prop-types';
+import { findChildByType, shallowDiff } from './Utils';
 
 const baseCls = 'fine-increment';
 const activeTrackStyleProps = ['activeTrackColor', 'trackColor', 'trackWidth'];
@@ -98,37 +99,37 @@ export default class FineIncrement extends PureComponent {
         const lastProps = this.props;
         const newState = {};
 
-        if (this.diff(lastProps, nextProps, fineIncrementStyleProps)) {
+        if (shallowDiff(lastProps, nextProps, fineIncrementStyleProps)) {
             Object.assign(newState, {
                 fineIncrementStyle: this.calculateFineIncrementStyle(nextProps),
             });
         }
 
-        if (this.diff(lastProps, nextProps, trackStyleProps)) {
+        if (shallowDiff(lastProps, nextProps, trackStyleProps)) {
             Object.assign(newState, {
                 trackStyle: this.calculateTrackStyle(nextProps),
             });
         }
 
-        if (this.diff(lastProps, nextProps, thumbStyleProps)) {
+        if (shallowDiff(lastProps, nextProps, thumbStyleProps)) {
             Object.assign(newState, {
                 thumbStyle: this.calculateThumbStyle(nextProps),
             });
         }
 
         let stops = null;
-        if (this.diff(lastProps, nextProps, stopPositionProps)) {
+        if (shallowDiff(lastProps, nextProps, stopPositionProps)) {
             stops = this.calculateStopPositions(nextProps);
             Object.assign(newState, { stops });
         }
 
         let value = null;
-        if (this.diff(lastProps, nextProps, valueProps)) {
+        if (shallowDiff(lastProps, nextProps, valueProps)) {
             value = this.calculateValue(nextProps);
             Object.assign(newState, { value });
         }
 
-        if (this.diff(lastProps, nextProps, [...activeTrackStyleProps, ...stopPositionProps, ...valueProps])) {
+        if (shallowDiff(lastProps, nextProps, [...activeTrackStyleProps, ...stopPositionProps, ...valueProps])) {
             Object.assign(newState, {
                 activeTrackStyle: this.calculateActiveTrackStyle(nextProps, this.calculatePositionFromValue(nextProps, stops, value)),
             });
@@ -145,17 +146,6 @@ export default class FineIncrement extends PureComponent {
         if (value !== nextState.value && nextState.value !== nextProps._value) {
             nextProps._onChange(nextState.value);
         }
-    }
-
-    // TODO: pull this to util function
-    diff(lastProps, nextProps, keys = []) {
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            if (lastProps[key] !== nextProps[key]) {
-                return true;
-            }
-        }
-        return false;
     }
 
     calculateFineIncrementStyle({ trackWidth }) {
@@ -344,17 +334,6 @@ export default class FineIncrement extends PureComponent {
         }
     }
 
-    findChildrenByType(children, type) {
-        const ret = [];
-        Children.forEach(children, (child) => {
-            const childType = child && child.type && (child.type.displayName || child.type.name);
-            if (childType === type) {
-                ret.push(child);
-            }
-        });
-        return ret;
-    }
-
     onTickClick = (idx) => {
         this.setState((state, props) => ({
             value: state.values[idx],
@@ -386,11 +365,11 @@ export default class FineIncrement extends PureComponent {
 
     renderMinusIcon() {
         const { children } = this.props;
-        const minusIcon = this.findChildrenByType(children, 'MinusIcon');
+        const minusIcon = findChildByType(children, 'MinusIcon');
 
         let ret;
-        if (minusIcon.length) {
-            ret = cloneElement(minusIcon.slice(-1)[0], {
+        if (minusIcon) {
+            ret = cloneElement(minusIcon, {
                 _onClick: this.onMinusIconClick,
             });
         }
@@ -399,11 +378,11 @@ export default class FineIncrement extends PureComponent {
 
     renderPlusIcon() {
         const { children } = this.props;
-        const plusIcon = this.findChildrenByType(children, 'PlusIcon');
+        const plusIcon = findChildByType(children, 'PlusIcon');
 
         let ret;
-        if (plusIcon.length) {
-            ret = cloneElement(plusIcon.slice(-1)[0], {
+        if (plusIcon) {
+            ret = cloneElement(plusIcon, {
                 _onClick: this.onPlusIconClick,
             });
         }
@@ -412,11 +391,11 @@ export default class FineIncrement extends PureComponent {
 
     renderTicks() {
         const { children, thumbBorderWidth, thumbDiameter, trackPadding, trackLength } = this.props;
-        const ticks = this.findChildrenByType(children, 'Ticks');
+        const ticks = findChildByType(children, 'Ticks');
 
         let ret;
-        if (ticks.length) {
-            ret = cloneElement(ticks.slice(-1)[0], {
+        if (ticks) {
+            ret = cloneElement(ticks, {
                 _onTickClick: this.onTickClick,
                 _thumbBorderWidth: thumbBorderWidth,
                 _thumbDiameter: thumbDiameter,

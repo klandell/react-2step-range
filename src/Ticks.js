@@ -1,5 +1,6 @@
 import React, { Children, PureComponent } from 'react';
 import { func, number, oneOfType, shape, string } from 'prop-types';
+import { shallowDiff } from './Utils';
 
 const baseCls = 'fine-increment_ticks';
 
@@ -59,25 +60,25 @@ export default class Ticks extends PureComponent {
         const lastProps = this.props;
         const newState = {};
 
-        if (this.diff(lastProps, nextProps, ticksStyleProps)) {
+        if (shallowDiff(lastProps, nextProps, ticksStyleProps)) {
             Object.assign(newState, {
                 ticksStyle: this.calculateTicksStyle(nextProps),
             });
         }
 
-        if (this.diff(lastProps, nextProps, tickStyleProps)) {
+        if (shallowDiff(lastProps, nextProps, tickStyleProps)) {
             Object.assign(newState, {
                 tickStyle: this.calculateTicksStyle(nextProps),
             });
         }
 
-        if (this.diff(lastProps, nextProps, dotStyleProps)) {
+        if (shallowDiff(lastProps, nextProps, dotStyleProps)) {
             Object.assign(newState, {
                 dotStyle: this.calculateDotStyle(nextProps),
             });
         }
 
-        if (this.diff(lastProps, nextProps, labelStyleProps)) {
+        if (shallowDiff(lastProps, nextProps, labelStyleProps)) {
             Object.assign(newState, {
                 labelStyle: this.calculateLabelStyle(nextProps),
             });
@@ -86,17 +87,6 @@ export default class Ticks extends PureComponent {
         if (Object.keys(newState).length) {
             this.setState(newState);
         }
-    }
-
-    // TODO: pull this to util function
-    diff(lastProps, nextProps, keys = []) {
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            if (lastProps[key] !== nextProps[key]) {
-                return true;
-            }
-        }
-        return false;
     }
 
     calculateTicksStyle({ _thumbDiameter, _thumbBorderWidth, _trackLength, _trackPadding, tickDiameter }) {
