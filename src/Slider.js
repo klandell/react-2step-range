@@ -1,6 +1,7 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, object, oneOfType, shape, number } from 'prop-types';
 
+const baseCls = 'react-2step-range';
 const valueProps = ['value'];
 const styleProps = ['height', 'width'];
 
@@ -155,7 +156,7 @@ export default class Slider extends PureComponent {
     render() {
         const { style } = this.state;
         return (
-            <div style={style}>
+            <div className={baseCls} style={style}>
                 {this.renderCoarseIncrement()}
                 {this.renderFineIncrement()}
             </div>
