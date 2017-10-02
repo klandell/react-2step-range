@@ -1,6 +1,6 @@
 {
   "name": "react-2step-range",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A highly customizable replacement for the HTML range input with two level of adjustment granularity\"",
   "main": "dist/index.js",
   "dependencies": {
@@ -29,5 +29,9 @@
   "bugs": {
     "url": "https://github.com/klandell/react-2step-range/issues"
   },
-  "homepage": "https://github.com/klandell/react-2step-range#readme"
+  "homepage": "https://github.com/klandell/react-2step-range#readme",
+  "files": [
+    "src/",
+    "dist/"
+  ]
 }
