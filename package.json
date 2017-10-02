@@ -1,12 +1,33 @@
 {
-  "name": "react-timeline-slider",
-  "version": "1.0.0",
-  "description": "A responsive cross browser replacement for the input range HTML element",
+  "name": "react-2step-range",
+  "version": "0.0.1",
+  "description": "A highly customizable replacement for the HTML range input with two level of adjustment granularity\"",
   "main": "dist/index.js",
-  "author": "Kyle Landell",
-  "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "prop-types": "^15.6.0",
+    "react": "^16.0.0"
+  },
   "devDependencies": {
-    "webpack": "^3.6.0"
-  }
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1"
+  },
+  "scripts": {
+    "prepare": "babel ./src --out-dir ./dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/klandell/react-2step-range.git"
+  },
+  "author": "Kyle Landell <kyle.landell@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/klandell/react-2step-range/issues"
+  },
+  "homepage": "https://github.com/klandell/react-2step-range#readme"
 }
