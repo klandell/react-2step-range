@@ -19,10 +19,14 @@ const styles = {
 
 export default class PlusIcon extends PureComponent {
     static propTypes = {
-        _onClick: func.isRequired, // @private use only
+        _onClick: func, // @private use only
         height: number.isRequired,
         width: number.isRequired,
         src: string.isRequired,
+    }
+
+    static defaultProps = {
+        _onClick: () => {},
     }
 
     render() {

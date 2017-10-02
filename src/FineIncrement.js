@@ -84,7 +84,7 @@ export default class FineIncrement extends PureComponent {
             thumbContainerStyle: this.calculateThumbContainerStyle(props), // TODO: allow this to be updated
             thumbStyle: this.calculateThumbStyle(props),
             // TODO: allow this to be updated
-            values: new Array((max - min) + 1).fill().map((d, i) => i + min),
+            values: new Array((max - min) + 1).fill().map((d, i) => i + min), // TODO: use step in calc
             stops,
             value,
         });
@@ -284,17 +284,41 @@ export default class FineIncrement extends PureComponent {
         }
     }
 
-    onThumbContainerMouseUp = () => {
+    onThumbContainerTouchStart = () => {
+        this.isSlidable = true;
+    }
+
+    onThumbContainerMouseUpTouchEnd = () => {
         this.isSlidable = false;
     }
 
-    onThumbContainerMouseMove = ({ clientX }) => {
-        // TODO: combine with onThumbContainerClick fn?
+    onMouseMove = ({ clientX }) => {
+        // TODO: combine with onThumbContainerClick fn and onTouchMove
         // TODO: move this event to the window instead?
         if (this.isSlidable) {
             const mouseLocation = clientX - this.thumbContainer.getBoundingClientRect().left;
             this.setState((state, props) => {
                 const value = this.calculateValueFromPosition(state, mouseLocation);
+
+                if (value !== state.value) {
+                    const position = this.calculatePositionFromValue(props, state.stops, value);
+                    return {
+                        activeTrackStyle: this.calculateActiveTrackStyle(props, position),
+                        value,
+                    };
+                }
+                return {};
+            });
+        }
+    }
+
+    onTouchMove = ({ touches }) => {
+        // TODO: combine with onThumbContainerClick fn?
+        // TODO: move this event to the window instead?
+        if (this.isSlidable && (typeof touches !== 'undefined')) {
+            const touchLocation = touches[0].clientX - this.thumbContainer.getBoundingClientRect().left;
+            this.setState((state, props) => {
+                const value = this.calculateValueFromPosition(state, touchLocation);
 
                 if (value !== state.value) {
                     const position = this.calculatePositionFromValue(props, state.stops, value);
@@ -328,7 +352,7 @@ export default class FineIncrement extends PureComponent {
 
     onMinusIconClick = () => {
         this.setState((state, props) => {
-            const value = Math.max(props.min, state.value - 1);
+            const value = Math.max(props.min, state.value - props.step);
             const position = this.calculatePositionFromValue(props, state.stops, value);
             return {
                 value,
@@ -339,7 +363,7 @@ export default class FineIncrement extends PureComponent {
 
     onPlusIconClick = () => {
         this.setState((state, props) => {
-            const value = Math.min(props.max, state.value + 1);
+            const value = Math.min(props.max, state.value + props.step);
             const position = this.calculatePositionFromValue(props, state.stops, value);
             return {
                 value,
@@ -405,7 +429,8 @@ export default class FineIncrement extends PureComponent {
             <div
               className={`${baseCls} ${cls}`}
               style={styles.fineIncrementStyle}
-              onMouseMove={this.onThumbContainerMouseMove}
+              onMouseMove={this.onMouseMove}
+              onTouchMove={this.onTouchMove}
             >
                 {this.renderMinusIcon()}
                 <div style={fineIncrementStyle}>
@@ -418,7 +443,9 @@ export default class FineIncrement extends PureComponent {
                       style={thumbContainerStyle}
                       onClick={this.onThumbContainerClick}
                       onMouseDown={this.onThumbContainerMouseDown}
-                      onMouseUp={this.onThumbContainerMouseUp}
+                      onTouchStart={this.onThumbContainerTouchStart}
+                      onTouchEnd={this.onThumbContainerMouseUpTouchEnd}
+                      onMouseUp={this.onThumbContainerMouseUpTouchEnd}
                       ref={(c) => { this.thumbContainer = c; }}
                     >
                         <div

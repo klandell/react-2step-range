@@ -106,7 +106,7 @@ export default class Ticks extends PureComponent {
             margin: 0,
             marginLeft: _trackPadding.left - (tickDiameter / 2),
             padding: 0,
-            marginTop: 0 - (_thumbDiameter + (_thumbBorderWidth * 1)) - Math.ceil(tickDiameter / 2),
+            marginTop: 0 - (_thumbDiameter + (_thumbBorderWidth * 2)) - Math.ceil(tickDiameter / 2),
             WebkitTouchCallout: 'none',
             WebkitUserSelect: 'none',
             MozUserSelect: 'none',
