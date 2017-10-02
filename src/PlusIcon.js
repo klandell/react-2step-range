@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { func, number, object, string } from 'prop-types';
 import { shallowDiff } from './Utils';
+import { PLUS_ICON_CLS } from './Constants';
 
 const styleProps = ['style'];
 
@@ -73,12 +74,14 @@ export default class PlusIcon extends PureComponent {
             <button
               style={style}
               onClick={_onClick}
+              className={PLUS_ICON_CLS}
             >
                 <img
                   height={height}
                   width={width}
                   src={src}
                   alt="minus"
+                  className={`${PLUS_ICON_CLS}_img`}
                 />
             </button>
         );

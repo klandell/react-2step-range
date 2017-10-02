@@ -1,6 +1,7 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, object } from 'prop-types';
 import { findChildByType, shallowDiff } from './Utils';
+import { COARSE_INCREMENT_CLS } from './Constants';
 
 const valueProps = ['_value'];
 const styleProps = ['style'];
@@ -141,9 +142,12 @@ export default class CoarseIncrement extends PureComponent {
         const { valueStyle } = this.props;
         const { style, value } = this.state;
         return (
-            <div style={style}>
+            <div className={COARSE_INCREMENT_CLS} style={style}>
                 {this.renderMinusIcon()}
-                <span style={valueStyle}>{value}</span>
+                <span
+                  className={`${COARSE_INCREMENT_CLS}_value`}
+                  style={valueStyle}
+                >{value}</span>
                 {this.renderPlusIcon()}
             </div>
         );

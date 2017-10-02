@@ -1,8 +1,7 @@
 import React, { Children, PureComponent } from 'react';
 import { func, number, oneOfType, shape, string } from 'prop-types';
 import { shallowDiff } from './Utils';
-
-const baseCls = 'fine-increment_ticks';
+import { TICKS_CLS } from './Constants';
 
 // TODO: allow dot to be colored based on current value
 const ticksStyleProps = ['_thumbDiameter', '_thumbBorderWidth', '_trackLength', '_trackPadding', 'tickDiameter'];
@@ -143,7 +142,7 @@ export default class Ticks extends PureComponent {
 
         return Children.map(children, (child, i) => (
             <li
-              className={`${baseCls}_tick`}
+              className={`${TICKS_CLS}_tick`}
               style={tickStyle}
             >
                 <div
@@ -163,7 +162,7 @@ export default class Ticks extends PureComponent {
     render() {
         const { ticksStyle } = this.state;
         return (
-            <ul className={baseCls} style={ticksStyle}>
+            <ul className={TICKS_CLS} style={ticksStyle}>
                 {this.renderChildren()}
             </ul>
         );

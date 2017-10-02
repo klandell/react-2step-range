@@ -1,8 +1,8 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, shape, string } from 'prop-types';
 import { findChildByType, shallowDiff } from './Utils';
+import { FINE_INCREMENT_CLS } from './Constants';
 
-const baseCls = 'fine-increment';
 const activeTrackStyleProps = ['activeTrackColor', 'trackColor', 'trackWidth'];
 const fineIncrementStyleProps = ['thumbDiameter'];
 const trackStyleProps = ['trackWidth', 'height', 'lineColor', 'padding'];
@@ -418,7 +418,7 @@ export default class FineIncrement extends PureComponent {
 
         return (
             <div
-              className={`${baseCls} ${cls}`}
+              className={`${FINE_INCREMENT_CLS} ${cls}`}
               style={styles.fineIncrementStyle}
               onMouseMove={this.onMouseMove}
               onTouchMove={this.onTouchMove}
@@ -426,11 +426,11 @@ export default class FineIncrement extends PureComponent {
                 {this.renderMinusIcon()}
                 <div style={fineIncrementStyle}>
                     <div
-                      className={`${baseCls}_track`}
+                      className={`${FINE_INCREMENT_CLS}_track`}
                       style={trackStyle}
                     />
                     <div
-                      className={`${baseCls}_thumb-container`}
+                      className={`${FINE_INCREMENT_CLS}_thumb-container`}
                       style={thumbContainerStyle}
                       onClick={this.onThumbContainerClick}
                       onMouseDown={this.onThumbContainerMouseDown}
@@ -440,11 +440,11 @@ export default class FineIncrement extends PureComponent {
                       ref={(c) => { this.thumbContainer = c; }}
                     >
                         <div
-                          className={`${baseCls}_active-track`}
+                          className={`${FINE_INCREMENT_CLS}_active-track`}
                           style={activeTrackStyle}
                         />
                         <div
-                          className={`${baseCls}_thumb`}
+                          className={`${FINE_INCREMENT_CLS}_thumb`}
                           style={thumbStyle}
                         />
                     </div>
