@@ -4,7 +4,6 @@ import { func, number, oneOfType, shape, string } from 'prop-types';
 const baseCls = 'fine-increment_ticks';
 
 // TODO: allow dot to be colored based on current value
-// TODO: fix clicking when tick doesn't map directly to a value
 const ticksStyleProps = ['_thumbDiameter', '_thumbBorderWidth', '_trackLength', '_trackPadding', 'tickDiameter'];
 const tickStyleProps = ['tickDiameter'];
 const dotStyleProps = ['tickDiameter', 'tickColor'];

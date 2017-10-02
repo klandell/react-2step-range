@@ -1,6 +1,5 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, object, oneOfType, shape, number } from 'prop-types';
-import { CoarseIncrement, FineIncrement } from './';
 
 const baseCls = 'react-2step-range';
 const valueProps = ['value'];
@@ -113,12 +112,7 @@ export default class Slider extends PureComponent {
         return false;
     }
 
-    getDisplayName(cmp) {
-        return cmp.displayName || cmp.name;
-    }
-
-    findChildrenByType(children, cmp) {
-        const type = this.getDisplayName(cmp);
+    findChildrenByType(children, type) {
         const ret = [];
         Children.forEach(children, (child) => {
             const childType = child && child.type && (child.type.displayName || child.type.name);
@@ -132,7 +126,7 @@ export default class Slider extends PureComponent {
     renderCoarseIncrement() {
         const { children } = this.props;
         const { value } = this.state;
-        const coarseIncrement = this.findChildrenByType(children, CoarseIncrement);
+        const coarseIncrement = this.findChildrenByType(children, 'CoarseIncrement');
 
         let ret;
         if (coarseIncrement.length) {
@@ -147,7 +141,7 @@ export default class Slider extends PureComponent {
     renderFineIncrement() {
         const { children } = this.props;
         const { value } = this.state;
-        const fineIncrement = this.findChildrenByType(children, FineIncrement);
+        const fineIncrement = this.findChildrenByType(children, 'FineIncrement');
 
         let ret;
         if (fineIncrement.length) {
