@@ -1,5 +1,8 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
-import { func, oneOfType, shape, number } from 'prop-types';
+import { func, object, oneOfType, shape, number } from 'prop-types';
+
+const valueProps = ['value'];
+const styleProps = ['height', 'width'];
 
 export default class Slider extends PureComponent {
     static propTypes = {
@@ -9,30 +12,51 @@ export default class Slider extends PureComponent {
         }), shape({
             fine: number,
         })]).isRequired,
+        height: number.isRequired,
+        width: number.isRequired,
+        style: object,
         onChange: func,
     }
 
     static defaultProps = {
         onChange: () => {},
+        style: {},
     }
 
     constructor(props) {
         super(props);
         this.state = {
             value: null,
+            style: {},
         };
     }
 
     componentWillMount() {
-        const { value } = this.props;
-        this.setState({ value });
+        const { props } = this;
+        this.setState({
+            value: props.value,
+            style: this.calculateStyle(props),
+        });
     }
 
     componentWillReceiveProps(nextProps) {
         const lastProps = this.props;
+        const newState = {};
 
-        if (lastProps.value !== nextProps.value) {
-            this.setState({ value: nextProps.value });
+        if (this.diff(lastProps, nextProps, valueProps)) {
+            Object.assign(newState, {
+                value: nextProps.value,
+            });
+        }
+
+        if (this.diff(lastProps, nextProps, styleProps)) {
+            Object.assign(newState, {
+                style: this.calculateStyle(nextProps),
+            });
+        }
+
+        if (Object.keys(newState).length) {
+            this.setState(newState);
         }
     }
 
@@ -45,6 +69,17 @@ export default class Slider extends PureComponent {
         ) {
             nextProps.onChange(nextState.value);
         }
+    }
+
+    calculateStyle({ height, width, style }) {
+        return {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height,
+            width,
+            ...style,
+        };
     }
 
     onCoarseIncrementChange = (coarse) => {
@@ -63,6 +98,17 @@ export default class Slider extends PureComponent {
                 fine,
             },
         }));
+    }
+
+    // TODO: pull this to util function
+    diff(lastProps, nextProps, keys = []) {
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            if (lastProps[key] !== nextProps[key]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     findChildrenByType(children, type) {
@@ -107,8 +153,9 @@ export default class Slider extends PureComponent {
     }
 
     render() {
+        const { style } = this.state;
         return (
-            <div>
+            <div style={style}>
                 {this.renderCoarseIncrement()}
                 {this.renderFineIncrement()}
             </div>

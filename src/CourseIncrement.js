@@ -1,15 +1,8 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, object } from 'prop-types';
 
-const styles = {
-    coarseIncrement: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-};
-
 const valueProps = ['_value'];
+const styleProps = ['style'];
 
 export default class CoarseIncrement extends PureComponent {
     static propTypes = {
@@ -19,6 +12,7 @@ export default class CoarseIncrement extends PureComponent {
         valueStyle: object,
         min: number,
         max: number,
+        style: object,
     }
 
     static defaultProps = {
@@ -27,12 +21,15 @@ export default class CoarseIncrement extends PureComponent {
         step: 1,
         min: Number.MIN_SAFE_INTEGER,
         max: Number.MAX_SAFE_INTEGER,
+        style: {},
+        valueStyle: {},
     }
 
     constructor(props) {
         super(props);
         this.state = {
             value: null,
+            style: {},
         };
     }
 
@@ -41,6 +38,7 @@ export default class CoarseIncrement extends PureComponent {
 
         this.setState({
             value: this.calculateValue(props),
+            style: this.calculateStyle(props),
         });
     }
 
@@ -51,6 +49,12 @@ export default class CoarseIncrement extends PureComponent {
         if (this.diff(lastProps, nextProps, valueProps)) {
             Object.assign(newState, {
                 value: this.calculateValue(nextProps),
+            });
+        }
+
+        if (this.diff(lastProps, nextProps, styleProps)) {
+            Object.assign(newState, {
+                style: this.calculateStyle(nextProps),
             });
         }
 
@@ -78,6 +82,7 @@ export default class CoarseIncrement extends PureComponent {
         return false;
     }
 
+    // TODO: pull out into util function
     calculateValue({ _value, max, min }) {
         let val = _value;
 
@@ -89,6 +94,15 @@ export default class CoarseIncrement extends PureComponent {
             val = max;
         }
         return val;
+    }
+
+    calculateStyle({ style }) {
+        return {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            ...style,
+        };
     }
 
     findChildrenByType(children, type) {
@@ -144,9 +158,9 @@ export default class CoarseIncrement extends PureComponent {
 
     render() {
         const { valueStyle } = this.props;
-        const { value } = this.state;
+        const { style, value } = this.state;
         return (
-            <div style={styles.coarseIncrement}>
+            <div style={style}>
                 {this.renderMinusIcon()}
                 <span style={valueStyle}>{value}</span>
                 {this.renderPlusIcon()}
