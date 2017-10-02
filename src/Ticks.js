@@ -10,6 +10,8 @@ const dotStyleProps = ['tickDiameter', 'tickColor'];
 const labelStyleProps = ['labelFontSize'];
 
 export default class Ticks extends PureComponent {
+    static displayName = 'Ticks';
+
     static propsTypes = {
         _onTickClick: func.isRequired, // @private use only
         _thumbBorderWidth: number.isRequired, // @private use only

@@ -4,6 +4,8 @@ import { func, number, object, string } from 'prop-types';
 const styleProps = ['style'];
 
 export default class MinusIcon extends PureComponent {
+    static displayName = 'MinusIcon';
+
     static propTypes = {
         _onClick: func, // @private use only
         height: number.isRequired, // TODO: rename these to reference icon height

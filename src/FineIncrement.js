@@ -18,6 +18,8 @@ const styles = {
 };
 
 export default class FineIncrement extends PureComponent {
+    static displayName = 'FineIncrement';
+
     static propTypes = {
         _onChange: func, // @private use only
         _value: number, // @private use only

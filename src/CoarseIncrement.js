@@ -5,6 +5,8 @@ const valueProps = ['_value'];
 const styleProps = ['style'];
 
 export default class CoarseIncrement extends PureComponent {
+    static displayName = 'CoarseIncrement';
+    
     static propTypes = {
         _onChange: func, // @private use only
         _value: number, // TODO: allow categories?

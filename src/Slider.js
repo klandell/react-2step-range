@@ -6,6 +6,8 @@ const valueProps = ['value'];
 const styleProps = ['height', 'width'];
 
 export default class Slider extends PureComponent {
+    static displayName = 'Slider';
+
     static propTypes = {
         value: oneOfType([shape({
             coarse: number,
