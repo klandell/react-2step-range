@@ -4,6 +4,7 @@ import {
     calculateInitialState,
     calculateNextState,
     calculateNumericValue,
+    findClosestIdx,
     renderChildOfType,
 } from './Utils';
 import { FINE_INCREMENT_CLS } from './Constants';
@@ -218,34 +219,14 @@ export default class FineIncrement extends PureComponent {
           .map((d, i) => (i * step) + min);
     }
 
-    calculatePositionFromValue({ min, max, step }, stops, value) {
-        const values = new Array(Math.floor(((max - min) + 1) / step)).fill().map((d, i) => (i * step) + min); // TODO: use state
+    calculatePositionFromValue(props, stops, value) {
+        const values = this.calculateValues(props);
         const val = value === null ? this.state.value : value;
-
-        let valueIdx;
-        let minDiff = Number.MAX_SAFE_INTEGER;
-        for (let i = 0; i < values.length; i++) {
-            const diff = Math.abs(val - values[i]);
-            if (diff < minDiff) {
-                minDiff = diff;
-                valueIdx = i;
-            }
-        }
-        return (stops || this.state.stops)[valueIdx];
+        return (stops || this.state.stops)[findClosestIdx(values, val)];
     }
 
     calculateValueFromPosition({ stops, values }, position) {
-        // TODO: make this a function
-        let stopIdx;
-        let minDiff = Number.MAX_SAFE_INTEGER;
-        for (let i = 0; i < values.length; i++) {
-            const diff = Math.abs(position - stops[i]);
-            if (diff < minDiff) {
-                minDiff = diff;
-                stopIdx = i;
-            }
-        }
-        return values[stopIdx];
+        return values[findClosestIdx(stops, position)];
     }
 
     renderMinusIcon() {

@@ -72,3 +72,17 @@ export const calculateNumericValue = (value, max, min) => {
     }
     return ret;
 };
+
+export const findClosestIdx = (ary, value) => {
+    let minDiff = Number.MAX_SAFE_INTEGER;
+    let idx;
+
+    for (let i = 0; i < ary.length; i++) {
+        const diff = Math.abs(value - ary[i]);
+        if (diff < minDiff) {
+            minDiff = diff;
+            idx = i;
+        }
+    }
+    return idx;
+};
