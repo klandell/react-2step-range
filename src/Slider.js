@@ -1,10 +1,7 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, object, oneOfType, shape, number } from 'prop-types';
-import { findChildByType, shallowDiff} = './Utils';
+import { findChildByType, calculateNextState} = './Utils';
 import { SLIDER_CLS } = './Constants';
-
-const valueProps = ['value'];
-const styleProps = ['height', 'width'];
 
 export default class Slider extends PureComponent {
     static displayName = 'Slider';
@@ -44,23 +41,9 @@ export default class Slider extends PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        const lastProps = this.props;
-        const newState = {};
-
-        if (shallowDiff(lastProps, nextProps, valueProps)) {
-            Object.assign(newState, {
-                value: nextProps.value,
-            });
-        }
-
-        if (shallowDiff(lastProps, nextProps, styleProps)) {
-            Object.assign(newState, {
-                style: this.calculateStyle(nextProps),
-            });
-        }
-
-        if (Object.keys(newState).length) {
-            this.setState(newState);
+        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        if (Object.keys(nextState).length) {
+            this.setState(nextState);
         }
     }
 
@@ -143,4 +126,9 @@ export default class Slider extends PureComponent {
             </div>
         );
     }
+}
+
+const diffProps = {
+    value: ['value'],
+    style: ['height', 'width'],
 }

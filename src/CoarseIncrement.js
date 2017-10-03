@@ -1,10 +1,7 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, object } from 'prop-types';
-import { findChildByType, shallowDiff } from './Utils';
+import { findChildByType, calculateNextState } from './Utils';
 import { COARSE_INCREMENT_CLS } from './Constants';
-
-const valueProps = ['_value'];
-const styleProps = ['style'];
 
 export default class CoarseIncrement extends PureComponent {
     static displayName = 'CoarseIncrement';
@@ -47,23 +44,9 @@ export default class CoarseIncrement extends PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        const lastProps = this.props;
-        const newState = {};
-
-        if (shallowDiff(lastProps, nextProps, valueProps)) {
-            Object.assign(newState, {
-                value: this.calculateValue(nextProps),
-            });
-        }
-
-        if (shallowDiff(lastProps, nextProps, styleProps)) {
-            Object.assign(newState, {
-                style: this.calculateStyle(nextProps),
-            });
-        }
-
-        if (Object.keys(newState).length) {
-            this.setState(newState);
+        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        if (Object.keys(nextState).length) {
+            this.setState(nextState);
         }
     }
 
@@ -153,3 +136,8 @@ export default class CoarseIncrement extends PureComponent {
         );
     }
 }
+
+const diffProps = {
+    value: ['_value'],
+    style: ['style'],
+};

@@ -1,14 +1,9 @@
 import React, { Children, PureComponent } from 'react';
 import { func, number, oneOfType, shape, string } from 'prop-types';
-import { shallowDiff } from './Utils';
+import { calculateNextState } from './Utils';
 import { TICKS_CLS } from './Constants';
 
 // TODO: allow dot to be colored based on current value
-const ticksStyleProps = ['_thumbDiameter', '_thumbBorderWidth', '_trackLength', '_trackPadding', 'tickDiameter'];
-const tickStyleProps = ['tickDiameter'];
-const dotStyleProps = ['tickDiameter', 'tickColor'];
-const labelStyleProps = ['labelFontSize'];
-
 export default class Ticks extends PureComponent {
     static displayName = 'Ticks';
 
@@ -56,35 +51,9 @@ export default class Ticks extends PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        const lastProps = this.props;
-        const newState = {};
-
-        if (shallowDiff(lastProps, nextProps, ticksStyleProps)) {
-            Object.assign(newState, {
-                ticksStyle: this.calculateTicksStyle(nextProps),
-            });
-        }
-
-        if (shallowDiff(lastProps, nextProps, tickStyleProps)) {
-            Object.assign(newState, {
-                tickStyle: this.calculateTicksStyle(nextProps),
-            });
-        }
-
-        if (shallowDiff(lastProps, nextProps, dotStyleProps)) {
-            Object.assign(newState, {
-                dotStyle: this.calculateDotStyle(nextProps),
-            });
-        }
-
-        if (shallowDiff(lastProps, nextProps, labelStyleProps)) {
-            Object.assign(newState, {
-                labelStyle: this.calculateLabelStyle(nextProps),
-            });
-        }
-
-        if (Object.keys(newState).length) {
-            this.setState(newState);
+        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        if (Object.keys(nextState).length) {
+            this.setState(nextState);
         }
     }
 
@@ -167,4 +136,11 @@ export default class Ticks extends PureComponent {
             </ul>
         );
     }
+}
+
+const diffProps = {
+    ticksStyle: ['_thumbDiameter', '_thumbBorderWidth', '_trackLength', '_trackPadding', 'tickDiameter'],
+    tickStyle: ['tickDiameter'],
+    dotStyle: ['tickDiameter', 'tickColor'],
+    labelStyle: ['labelFontSize'],
 }

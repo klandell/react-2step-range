@@ -1,9 +1,7 @@
 import React, { PureComponent } from 'react';
 import { func, number, object, string } from 'prop-types';
-import { shallowDiff } from './Utils';
+import { calculateNextState } from './Utils';
 import { MINUS_ICON_CLS } from './Constants';
-
-const styleProps = ['style'];
 
 export default class Icon extends PureComponent {
     static displayName = 'Icon';
@@ -38,17 +36,9 @@ export default class Icon extends PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        const lastProps = this.props;
-        const newState = {};
-
-        if (shallowDiff(lastProps, nextProps, styleProps)) {
-            Object.assign(newState, {
-                style: this.calculateStyle(nextProps),
-            });
-        }
-
-        if (Object.keys(newState).length) {
-            this.setState(newState);
+        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        if (Object.keys(nextState).length) {
+            this.setState(nextState);
         }
     }
 
@@ -93,3 +83,7 @@ const styles = {
         userSelect: 'none',
     }
 }
+
+const diffProps = {
+    style: ['style'],
+};

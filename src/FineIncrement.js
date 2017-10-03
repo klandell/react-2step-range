@@ -455,3 +455,14 @@ export default class FineIncrement extends PureComponent {
         );
     }
 }
+
+/*
+const diffProps = {
+    activeTrackStyle: ['activeTrackColor', 'trackColor', 'trackWidth'],
+    fineIncrementStyle: ['thumbDiameter'],
+    trackStyle: ['trackWidth', 'height', 'lineColor', 'padding'],
+    thumbStyle: ['thumbBorderColor', 'thumbBorderWidth', 'thumbColor', 'thumbRadius'],
+    stopPosition: ['max', 'min', 'step', 'trackLength', 'trackPadding'],
+    value: ['_value'],
+}
+ */
