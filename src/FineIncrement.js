@@ -1,154 +1,86 @@
 import React, { PureComponent } from 'react';
 import { func, number, shape, string } from 'prop-types';
-import { calculateNumericValue, renderChildOfType, shallowDiff } from './Utils';
+import {
+    calculateInitialState,
+    calculateNextState,
+    calculateNumericValue,
+    renderChildOfType,
+} from './Utils';
 import { FINE_INCREMENT_CLS } from './Constants';
-
-const activeTrackStyleProps = ['activeTrackColor', 'trackColor', 'trackWidth'];
-const fineIncrementStyleProps = ['thumbDiameter'];
-const trackStyleProps = ['trackWidth', 'height', 'lineColor', 'padding'];
-const thumbStyleProps = ['thumbBorderColor', 'thumbBorderWidth', 'thumbColor', 'thumbRadius'];
-const stopPositionProps = ['max', 'min', 'step', 'trackLength', 'trackPadding'];
-const valueProps = ['_value'];
-
-const styles = {
-    fineIncrementStyle: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-};
 
 export default class FineIncrement extends PureComponent {
     static displayName = 'FineIncrement';
 
     static propTypes = {
-        _onChange: func, // @private use only
-        _value: number, // @private use only
+        _onChange: func,
+        _value: number,
         activeTrackColor: string,
-        cls: string,
-        min: number.isRequired,
         max: number.isRequired,
+        min: number.isRequired,
         onChange: func,
         step: number,
         thumbBorderColor: string,
         thumbBorderWidth: number,
         thumbColor: string,
         thumbDiameter: number,
-        trackLength: number.isRequired,
-        trackWidth: number,
         trackColor: string,
+        trackLength: number.isRequired,
         trackPadding: shape({
             left: number,
             right: number,
         }),
+        trackWidth: number,
     }
 
     static defaultProps = {
         _onChange: () => {},
         _value: null,
-        cls: '',
+        activeTrackColor: null,
         onChange: () => {},
         step: 1,
-        thumbBorderWidth: 0,
         thumbBorderColor: '#000',
+        thumbBorderWidth: 0,
         thumbColor: '#000',
         thumbDiameter: 11,
-        trackWidth: 1,
-        activeTrackColor: null,
         trackColor: '#000',
         trackPadding: { left: 0, right: 0 },
+        trackWidth: 1,
     }
 
     constructor(props) {
         super(props);
         this.state = {
             activeTrackStyle: {},
-            fineIncrementStyle: {}, // TODO: rename these
-            trackStyle: {},
+            stops: [],
             thumbContainerStyle: {},
             thumbStyle: {},
+            trackContainerStyle: {},
+            trackStyle: {},
             values: [],
-            stops: [],
             value: null,
         };
         this.isSlidable = false;
     }
 
     componentWillMount() {
-        const { props } = this;
-        const { min, max, step } = props;
-
-        const value = this.calculateValue(props);
-        const stops = this.calculateStopPositions(props);
-        const position = this.calculatePositionFromValue(props, stops, value);
-
-        this.setState({
-            activeTrackStyle: this.calculateActiveTrackStyle(props, position),
-            fineIncrementStyle: this.calculateFineIncrementStyle(props),
-            trackStyle: this.calculateTrackStyle(props),
-            thumbContainerStyle: this.calculateThumbContainerStyle(props), // TODO: allow this to be updated
-            thumbStyle: this.calculateThumbStyle(props),
-            // TODO: allow this to be updated
-            values: new Array(Math.floor(((max - min) + 1) / step)).fill().map((d, i) => (i * step) + min), // TODO: use step in calc
-            stops,
-            value,
-        });
+        this.setState(calculateInitialState.call(this, diffProps));
     }
 
     componentWillReceiveProps(nextProps) {
-        const lastProps = this.props;
-        const newState = {};
-
-        if (shallowDiff(lastProps, nextProps, fineIncrementStyleProps)) {
-            Object.assign(newState, {
-                fineIncrementStyle: this.calculateFineIncrementStyle(nextProps),
-            });
-        }
-
-        if (shallowDiff(lastProps, nextProps, trackStyleProps)) {
-            Object.assign(newState, {
-                trackStyle: this.calculateTrackStyle(nextProps),
-            });
-        }
-
-        if (shallowDiff(lastProps, nextProps, thumbStyleProps)) {
-            Object.assign(newState, {
-                thumbStyle: this.calculateThumbStyle(nextProps),
-            });
-        }
-
-        let stops = null;
-        if (shallowDiff(lastProps, nextProps, stopPositionProps)) {
-            stops = this.calculateStopPositions(nextProps);
-            Object.assign(newState, { stops });
-        }
-
-        let value = null;
-        if (shallowDiff(lastProps, nextProps, valueProps)) {
-            value = this.calculateValue(nextProps);
-            Object.assign(newState, { value });
-        }
-
-        if (shallowDiff(lastProps, nextProps, [...activeTrackStyleProps, ...stopPositionProps, ...valueProps])) {
-            Object.assign(newState, {
-                activeTrackStyle: this.calculateActiveTrackStyle(nextProps, this.calculatePositionFromValue(nextProps, stops, value)),
-            });
-        }
-
-        if (Object.keys(newState).length) {
-            this.setState(newState);
+        const nextState = calculateNextState.call(this, nextProps, diffProps);
+        if (Object.keys(nextState).length) {
+            this.setState(nextState);
         }
     }
 
     componentWillUpdate(nextProps, nextState) {
         const { value } = this.state;
-
         if (value !== nextState.value && nextState.value !== nextProps._value) {
             nextProps._onChange(nextState.value);
         }
     }
 
-    calculateFineIncrementStyle({ trackWidth }) {
+    calculateTrackContainerStyle({ trackWidth }) {
         return {
             height: trackWidth,
             display: 'flex',
@@ -158,7 +90,12 @@ export default class FineIncrement extends PureComponent {
         };
     }
 
-    calculateActiveTrackStyle({ activeTrackColor, trackColor, trackWidth, trackPadding }, position) {
+    calculateActiveTrackStyle(props) {
+        const { activeTrackColor, trackColor, trackWidth, trackPadding } = props;
+        const value = this.calculateValue(props);
+        const stops = this.calculateStops(props);
+        const position = this.calculatePositionFromValue(props, stops, value);
+
         return {
             width: position - trackPadding.left,
             flexGrow: 0,
@@ -203,7 +140,7 @@ export default class FineIncrement extends PureComponent {
         };
     }
 
-    calculateStopPositions({ max, min, step, trackLength, trackPadding }) {
+    calculateStops({ max, min, step, trackLength, trackPadding }) {
         const { left, right } = trackPadding;
 
         const usableTrack = trackLength - left - right;
@@ -222,6 +159,12 @@ export default class FineIncrement extends PureComponent {
 
     calculateValue({ _value, max, min }) {
         return calculateNumericValue(_value, max, min);
+    }
+
+    calculateValues({ max, min, step }) {
+        return new Array(Math.floor(((max - min) + 1) / step))
+          .fill()
+          .map((d, i) => (i * step) + min);
     }
 
     calculatePositionFromValue({ min, max, step }, stops, value) {
@@ -257,18 +200,9 @@ export default class FineIncrement extends PureComponent {
     onThumbContainerClick = ({ clientX, currentTarget }) => {
         // TODO: break this into a function too!!
         const clickLocation = (clientX - currentTarget.getBoundingClientRect().left);
-        this.setState((state, props) => {
-            const value = this.calculateValueFromPosition(state, clickLocation);
-
-            if (value !== state.value) {
-                const position = this.calculatePositionFromValue(props, state.stops, value);
-                return {
-                    activeTrackStyle: this.calculateActiveTrackStyle(props, position),
-                    value,
-                };
-            }
-            return {};
-        });
+        this.setState(state => ({
+            value: this.calculateValueFromPosition(state, clickLocation),
+        }));
     }
 
     onThumbContainerMouseDown = ({ button }) => {
@@ -290,18 +224,9 @@ export default class FineIncrement extends PureComponent {
         // TODO: move this event to the window instead?
         if (this.isSlidable) {
             const mouseLocation = clientX - this.thumbContainer.getBoundingClientRect().left;
-            this.setState((state, props) => {
-                const value = this.calculateValueFromPosition(state, mouseLocation);
-
-                if (value !== state.value) {
-                    const position = this.calculatePositionFromValue(props, state.stops, value);
-                    return {
-                        activeTrackStyle: this.calculateActiveTrackStyle(props, position),
-                        value,
-                    };
-                }
-                return {};
-            });
+            this.setState(state => ({
+                value: this.calculateValueFromPosition(state, mouseLocation),
+            }));
         }
     }
 
@@ -310,48 +235,29 @@ export default class FineIncrement extends PureComponent {
         // TODO: move this event to the window instead?
         if (this.isSlidable && (typeof touches !== 'undefined')) {
             const touchLocation = touches[0].clientX - this.thumbContainer.getBoundingClientRect().left;
-            this.setState((state, props) => {
-                const value = this.calculateValueFromPosition(state, touchLocation);
-
-                if (value !== state.value) {
-                    const position = this.calculatePositionFromValue(props, state.stops, value);
-                    return {
-                        activeTrackStyle: this.calculateActiveTrackStyle(props, position),
-                        value,
-                    };
-                }
-                return {};
-            });
+            this.setState(state => ({
+                value: this.calculateValueFromPosition(state, touchLocation),
+            }));
         }
     }
 
     onTickClick = (idx) => {
-        this.setState((state, props) => ({
+        // TODO: this shouldn't actually use IDX, doesn't work if less ticks than values
+        this.setState(state => ({
             value: state.values[idx],
-            activeTrackStyle: this.calculateActiveTrackStyle(props, state.stops[idx]),
         }));
     }
 
     onMinusIconClick = () => {
-        this.setState((state, props) => {
-            const value = Math.max(props.min, state.value - props.step);
-            const position = this.calculatePositionFromValue(props, state.stops, value);
-            return {
-                value,
-                activeTrackStyle: this.calculateActiveTrackStyle(props, position),
-            };
-        });
+        this.setState((state, props) => ({
+            value: Math.max(props.min, state.value - props.step),
+        }));
     }
 
     onPlusIconClick = () => {
-        this.setState((state, props) => {
-            const value = Math.min(props.max, state.value + props.step);
-            const position = this.calculatePositionFromValue(props, state.stops, value);
-            return {
-                value,
-                activeTrackStyle: this.calculateActiveTrackStyle(props, position), // TODO: I think I can get rid of all of these
-            };
-        });
+        this.setState((state, props) => ({
+            value: Math.min(props.max, state.value + props.step),
+        }));
     }
 
     renderMinusIcon() {
@@ -378,9 +284,8 @@ export default class FineIncrement extends PureComponent {
     }
 
     render() {
-        const { cls } = this.props;
         const {
-          fineIncrementStyle,
+          trackContainerStyle,
           activeTrackStyle,
           trackStyle,
           thumbContainerStyle,
@@ -389,13 +294,13 @@ export default class FineIncrement extends PureComponent {
 
         return (
             <div
-              className={`${FINE_INCREMENT_CLS} ${cls}`}
+              className={`${FINE_INCREMENT_CLS}`}
               style={styles.fineIncrementStyle}
               onMouseMove={this.onMouseMove}
               onTouchMove={this.onTouchMove}
             >
                 {this.renderMinusIcon()}
-                <div style={fineIncrementStyle}>
+                <div style={trackContainerStyle}>
                     <div
                       className={`${FINE_INCREMENT_CLS}_track`}
                       style={trackStyle}
@@ -427,13 +332,31 @@ export default class FineIncrement extends PureComponent {
     }
 }
 
-/*
 const diffProps = {
-    activeTrackStyle: ['activeTrackColor', 'trackColor', 'trackWidth'],
-    fineIncrementStyle: ['thumbDiameter'],
-    trackStyle: ['trackWidth', 'height', 'lineColor', 'padding'],
+    activeTrackStyle: [
+        'activeTrackColor',
+        'trackColor',
+        'trackWidth',
+        'max',
+        'min',
+        'step',
+        'trackLength',
+        'trackPadding',
+        '_value',
+    ],
+    stops: ['max', 'min', 'step', 'trackLength', 'trackPadding'],
+    thumbContainerStyle: ['thumbDiameter', 'thumbBorderWidth'],
     thumbStyle: ['thumbBorderColor', 'thumbBorderWidth', 'thumbColor', 'thumbRadius'],
-    stopPosition: ['max', 'min', 'step', 'trackLength', 'trackPadding'],
+    trackContainerStyle: ['trackWidth'],
+    trackStyle: ['trackWidth', 'height', 'lineColor', 'padding'],
+    values: ['max', 'min', 'step'],
     value: ['_value'],
-}
- */
+};
+
+const styles = {
+    fineIncrementStyle: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+};
