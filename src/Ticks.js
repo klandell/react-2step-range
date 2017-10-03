@@ -1,6 +1,6 @@
 import React, { Children, PureComponent } from 'react';
 import { func, number, oneOfType, shape, string } from 'prop-types';
-import { calculateNextState } from './Utils';
+import { calculateInitialState, calculateNextState } from './Utils';
 import { TICKS_CLS } from './Constants';
 
 // TODO: allow dot to be colored based on current value
@@ -40,14 +40,7 @@ export default class Ticks extends PureComponent {
     }
 
     componentWillMount() {
-        const { props } = this;
-
-        this.setState({
-            ticksStyle: this.calculateTicksStyle(props),
-            tickStyle: this.calculateTickStyle(props),
-            dotStyle: this.calculateDotStyle(props),
-            labelStyle: this.calculateLabelStyle(props),
-        });
+        this.setState(calculateInitialState(this.props));
     }
 
     componentWillReceiveProps(nextProps) {

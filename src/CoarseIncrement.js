@@ -1,6 +1,6 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, object } from 'prop-types';
-import { findChildByType, calculateNextState } from './Utils';
+import { findChildByType, calculateInitialState, calculateNextState } from './Utils';
 import { COARSE_INCREMENT_CLS } from './Constants';
 
 export default class CoarseIncrement extends PureComponent {
@@ -35,12 +35,7 @@ export default class CoarseIncrement extends PureComponent {
     }
 
     componentWillMount() {
-        const { props } = this;
-
-        this.setState({
-            value: this.calculateValue(props),
-            style: this.calculateStyle(props),
-        });
+        this.setState(calculateInitialState(this.props));
     }
 
     componentWillReceiveProps(nextProps) {

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { func, number, object, string } from 'prop-types';
-import { calculateNextState } from './Utils';
+import { calculateInitialState, calculateNextState } from './Utils';
 import { MINUS_ICON_CLS } from './Constants';
 
 export default class Icon extends PureComponent {
@@ -31,8 +31,7 @@ export default class Icon extends PureComponent {
     }
 
     componentWillMount() {
-        const { props } = this;
-        this.setState({ style: this.calculateStyle(props) });
+        this.setState(calculateInitialState(this.props));
     }
 
     componentWillReceiveProps(nextProps) {

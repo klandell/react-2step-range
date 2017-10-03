@@ -1,6 +1,6 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, number, shape, string } from 'prop-types';
-import { findChildByType, shallowDiff } from './Utils';
+import { findChildByType, calculateInitialState, shallowDiff } from './Utils';
 import { FINE_INCREMENT_CLS } from './Constants';
 
 const activeTrackStyleProps = ['activeTrackColor', 'trackColor', 'trackWidth'];

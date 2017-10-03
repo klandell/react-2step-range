@@ -26,6 +26,17 @@ export const shallowDiff(last, next, keys = []) => {
     return false;
 }
 
+export const calculateInitialState = function(props, diffProps, fnPrefix = 'calculate') {
+    const initialState = {};
+
+    Object.keys(diffProps).forEach((k) => {
+        Object.assign(initialState, {
+            [k]: this[`${fnPrefix}${k.toUpperCase()}`](props)
+        })
+    });
+    return initialState;
+}
+
 export const calculateNextState = function(lastProps, nextProps, diffProps, fnPrefix = 'calculate') {
     const nextState = {};
 
