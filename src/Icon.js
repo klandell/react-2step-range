@@ -1,19 +1,18 @@
 import React, { PureComponent } from 'react';
 import { func, number, object, string } from 'prop-types';
 import { calculateInitialState, calculateNextState } from './Utils';
-import { MINUS_ICON_CLS } from './Constants';
 
 export default class Icon extends PureComponent {
     static displayName = 'Icon';
 
     static propTypes = {
-        _onClick: func, // @private use only
-        height: number.isRequired,
-        width: number.isRequired,
-        src: string.isRequired,
+        _onClick: func,
         alt: string,
         className: string,
+        height: number.isRequired,
+        src: string.isRequired,
         style: object,
+        width: number.isRequired,
     }
 
     static defaultProps = {
@@ -46,7 +45,7 @@ export default class Icon extends PureComponent {
     }
 
     render() {
-        const { _onClick, alt, height, width, className, src } = this.props;
+        const { _onClick, alt, className, height, src, width } = this.props;
         const { style } = this.state;
 
         return (

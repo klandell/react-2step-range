@@ -1,22 +1,22 @@
-import React, { cloneElement, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import { func, object, oneOfType, shape, number } from 'prop-types';
-import { findChildByType, calculateNextState } from './Utils';
+import { calculateInitialState, calculateNextState, renderChildOfType } from './Utils';
 import { SLIDER_CLS } from './Constants';
 
 export default class Slider extends PureComponent {
     static displayName = 'Slider';
 
     static propTypes = {
+        height: number.isRequired,
+        onChange: func,
+        style: object,
         value: oneOfType([shape({
             coarse: number,
             fine: number,
         }), shape({
             fine: number,
         })]).isRequired,
-        height: number.isRequired,
         width: number.isRequired,
-        style: object,
-        onChange: func,
     }
 
     static defaultProps = {
@@ -27,17 +27,13 @@ export default class Slider extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            value: null,
             style: {},
+            value: null,
         };
     }
 
     componentWillMount() {
-        const { props } = this;
-        this.setState({
-            value: props.value,
-            style: this.calculateStyle(props),
-        });
+        this.setState(calculateInitialState.call(this, diffProps));
     }
 
     componentWillReceiveProps(nextProps) {
@@ -47,6 +43,7 @@ export default class Slider extends PureComponent {
         }
     }
 
+    // TODO: clean this up
     componentWillUpdate(nextProps, nextState) {
         const { value } = this.state;
 
@@ -58,63 +55,45 @@ export default class Slider extends PureComponent {
         }
     }
 
+    onCoarseIncrementChange = (coarse) => {
+        this.setState(state => ({
+            value: { ...state.value, coarse },
+        }));
+    }
+
+    onFineIncrementChange = (fine) => {
+        this.setState(state => ({
+            value: { ...state.value, fine },
+        }));
+    }
+
     calculateStyle({ height, width, style }) {
         return {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
+            ...styles.slider,
             height,
             width,
             ...style,
         };
     }
 
-    onCoarseIncrementChange = (coarse) => {
-        this.setState(state => ({
-            value: {
-                ...state.value,
-                coarse,
-            },
-        }));
-    }
-
-    onFineIncrementChange = (fine) => {
-        this.setState(state => ({
-            value: {
-                ...state.value,
-                fine,
-            },
-        }));
+    calculateValue({ value }) {
+        return value;
     }
 
     renderCoarseIncrement() {
-        const { children } = this.props;
         const { value } = this.state;
-        const coarseIncrement = findChildByType(children, 'CoarseIncrement');
-
-        let ret;
-        if (coarseIncrement) {
-            ret = cloneElement(coarseIncrement, {
-                _onChange: this.onCoarseIncrementChange,
-                _value: value.coarse,
-            });
-        }
-        return ret;
+        return renderChildOfType.call(this, 'CoarseIncrement', {
+            _onChange: this.onCoarseIncrementChange,
+            _value: value.coarse,
+        });
     }
 
     renderFineIncrement() {
-        const { children } = this.props;
         const { value } = this.state;
-        const fineIncrement = findChildByType(children, 'FineIncrement');
-
-        let ret;
-        if (fineIncrement) {
-            ret = cloneElement(fineIncrement, {
-                _onChange: this.onFineIncrementChange,
-                _value: value.fine,
-            });
-        }
-        return ret;
+        return renderChildOfType.call(this, 'FineIncrement', {
+            _onChange: this.onFineIncrementChange,
+            _value: value.fine,
+        });
     }
 
     render() {
@@ -129,6 +108,14 @@ export default class Slider extends PureComponent {
 }
 
 const diffProps = {
-    value: ['value'],
     style: ['height', 'width'],
+    value: ['value'],
+};
+
+const styles = {
+    slider: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+    },
 };

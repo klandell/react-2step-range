@@ -1,6 +1,6 @@
-import React, { Children, cloneElement, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import { func, number, shape, string } from 'prop-types';
-import { findChildByType, calculateInitialState, shallowDiff } from './Utils';
+import { calculateNumericValue, renderChildOfType, shallowDiff } from './Utils';
 import { FINE_INCREMENT_CLS } from './Constants';
 
 const activeTrackStyleProps = ['activeTrackColor', 'trackColor', 'trackWidth'];
@@ -221,16 +221,7 @@ export default class FineIncrement extends PureComponent {
     }
 
     calculateValue({ _value, max, min }) {
-        let val = _value;
-
-        if (_value === null) {
-            val = min + ((max - min) / 2);
-        } else if (_value < min) {
-            val = min;
-        } else if (_value > max) {
-            val = max;
-        }
-        return val;
+        return calculateNumericValue(_value, max, min);
     }
 
     calculatePositionFromValue({ min, max, step }, stops, value) {
@@ -364,46 +355,26 @@ export default class FineIncrement extends PureComponent {
     }
 
     renderMinusIcon() {
-        const { children } = this.props;
-        const minusIcon = findChildByType(children, 'MinusIcon');
-
-        let ret;
-        if (minusIcon) {
-            ret = cloneElement(minusIcon, {
-                _onClick: this.onMinusIconClick,
-            });
-        }
-        return ret;
+        return renderChildOfType.call(this, 'MinusIcon', {
+            _onClick: this.onMinusIconClick,
+        });
     }
 
     renderPlusIcon() {
-        const { children } = this.props;
-        const plusIcon = findChildByType(children, 'PlusIcon');
-
-        let ret;
-        if (plusIcon) {
-            ret = cloneElement(plusIcon, {
-                _onClick: this.onPlusIconClick,
-            });
-        }
-        return ret;
+        return renderChildOfType.call(this, 'PlusIcon', {
+            _onClick: this.onPlusIconClick,
+        });
     }
 
     renderTicks() {
-        const { children, thumbBorderWidth, thumbDiameter, trackPadding, trackLength } = this.props;
-        const ticks = findChildByType(children, 'Ticks');
-
-        let ret;
-        if (ticks) {
-            ret = cloneElement(ticks, {
-                _onTickClick: this.onTickClick,
-                _thumbBorderWidth: thumbBorderWidth,
-                _thumbDiameter: thumbDiameter,
-                _trackPadding: trackPadding,
-                _trackLength: trackLength,
-            });
-        }
-        return ret;
+        const { thumbBorderWidth, thumbDiameter, trackPadding, trackLength } = this.props;
+        return renderChildOfType.call(this, 'Ticks', {
+            _onTickClick: this.onTickClick,
+            _thumbBorderWidth: thumbBorderWidth,
+            _thumbDiameter: thumbDiameter,
+            _trackPadding: trackPadding,
+            _trackLength: trackLength,
+        });
     }
 
     render() {

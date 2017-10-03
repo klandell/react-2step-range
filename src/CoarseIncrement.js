@@ -1,27 +1,32 @@
-import React, { Children, cloneElement, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import { func, number, object } from 'prop-types';
-import { findChildByType, calculateInitialState, calculateNextState } from './Utils';
+import {
+    calculateInitialState,
+    calculateNextState,
+    calculateNumericValue,
+    renderChildOfType,
+} from './Utils';
 import { COARSE_INCREMENT_CLS } from './Constants';
 
 export default class CoarseIncrement extends PureComponent {
     static displayName = 'CoarseIncrement';
 
     static propTypes = {
-        _onChange: func, // @private use only
-        _value: number, // TODO: allow categories?
-        step: number,
-        valueStyle: object,
-        min: number,
+        _onChange: func,
+        _value: number,
         max: number,
+        min: number,
+        step: number,
         style: object,
+        valueStyle: object,
     }
 
     static defaultProps = {
         _onChange: () => {},
         _value: 0,
-        step: 1,
-        min: Number.MIN_SAFE_INTEGER,
         max: Number.MAX_SAFE_INTEGER,
+        min: Number.MIN_SAFE_INTEGER,
+        step: 1,
         style: {},
         valueStyle: {},
     }
@@ -29,8 +34,8 @@ export default class CoarseIncrement extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            value: null,
             style: {},
+            value: null,
         };
     }
 
@@ -47,33 +52,9 @@ export default class CoarseIncrement extends PureComponent {
 
     componentWillUpdate(nextProps, nextState) {
         const { value } = this.state;
-
         if (value !== nextState.value && nextState.value !== nextProps._value) {
             nextProps._onChange(nextState.value);
         }
-    }
-
-    // TODO: pull out into util function
-    calculateValue({ _value, max, min }) {
-        let val = _value;
-
-        if (_value === null) {
-            val = min + ((max - min) / 2);
-        } else if (_value < min) {
-            val = min;
-        } else if (_value > max) {
-            val = max;
-        }
-        return val;
-    }
-
-    calculateStyle({ style }) {
-        return {
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            ...style,
-        };
     }
 
     onMinusIconClick = () => {
@@ -90,30 +71,24 @@ export default class CoarseIncrement extends PureComponent {
         });
     }
 
-    renderMinusIcon() {
-        const { children } = this.props;
-        const minusIcon = findChildByType(children, 'MinusIcon');
+    calculateStyle({ style }) {
+        return { ...styles.coarse, ...style };
+    }
 
-        let ret;
-        if (minusIcon) {
-            ret = cloneElement(minusIcon, {
-                _onClick: this.onMinusIconClick,
-            });
-        }
-        return ret;
+    calculateValue({ _value, max, min }) {
+        return calculateNumericValue(_value, max, min);
+    }
+
+    renderMinusIcon() {
+        return renderChildOfType.call(this, 'MinusIcon', {
+            _onClick: this.onMinusIconClick,
+        });
     }
 
     renderPlusIcon() {
-        const { children } = this.props;
-        const plusIcon = findChildByType(children, 'PlusIcon');
-
-        let ret;
-        if (plusIcon) {
-            ret = cloneElement(plusIcon, {
-                _onClick: this.onPlusIconClick,
-            });
-        }
-        return ret;
+        return renderChildOfType.call(this, 'PlusIcon', {
+            _onClick: this.onPlusIconClick,
+        });
     }
 
     render() {
@@ -135,4 +110,12 @@ export default class CoarseIncrement extends PureComponent {
 const diffProps = {
     value: ['_value'],
     style: ['style'],
+};
+
+const styles = {
+    coarse: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
 };

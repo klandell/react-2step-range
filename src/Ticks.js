@@ -8,23 +8,21 @@ export default class Ticks extends PureComponent {
     static displayName = 'Ticks';
 
     static propsTypes = {
-        _onTickClick: func.isRequired, // @private use only
-        _thumbBorderWidth: number.isRequired, // @private use only
-        _thumbDiameter: number.isRequired, // @private use only
+        _onTickClick: func.isRequired,
+        _thumbBorderWidth: number.isRequired,
+        _thumbDiameter: number.isRequired,
+        _trackLength: number.isRequired,
         _trackPadding: shape({
             left: number,
             right: number,
-        }).isRequired, // @private use only
-        _trackLength: number.isRequired, // @private use only
+        }).isRequired,
         labelFontSize: oneOfType([number, string]),
-        onTickClick: func,
         tickColor: string,
         tickDiameter: number,
     }
 
     static defaultProps = {
         labelFontSize: 12,
-        onTickClick: () => {},
         tickColor: '#000',
         tickDiameter: 7,
     }
@@ -32,10 +30,10 @@ export default class Ticks extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
-            ticksStyle: {},
-            tickStyle: {},
             dotStyle: {},
             labelStyle: {},
+            tickStyle: {},
+            ticksStyle: {},
         };
     }
 
@@ -50,52 +48,41 @@ export default class Ticks extends PureComponent {
         }
     }
 
-    calculateTicksStyle({ _thumbDiameter, _thumbBorderWidth, _trackLength, _trackPadding, tickDiameter }) {
+    calculateTicksStyle({ _thumbBorderWidth, _thumbDiameter, tickDiameter, _trackLength, _trackPadding }) {
         return {
-            listStyle: 'none',
-            display: 'flex',
-            justifyContent: 'space-between',
+            ...styles.ticks,
             width: (_trackLength - _trackPadding.left - _trackPadding.right) + tickDiameter,
             margin: 0,
-            marginLeft: _trackPadding.left - (tickDiameter / 2),
+            marginLeft: _trackPadding.left - Math.ceil(tickDiameter / 2),
             padding: 0,
             marginTop: 0 - (_thumbDiameter + (_thumbBorderWidth * 2)) - Math.ceil(tickDiameter / 2),
-            WebkitTouchCallout: 'none',
-            WebkitUserSelect: 'none',
-            MozUserSelect: 'none',
-            msUserSelect: 'none',
-            userSelect: 'none',
         };
     }
 
     calculateTickStyle({ tickDiameter }) {
-        return {
-            width: tickDiameter,
-        };
+        return { width: tickDiameter };
     }
 
     calculateDotStyle({ tickDiameter, tickColor }) {
         return {
+            ...styles.dot,
             height: tickDiameter,
             width: tickDiameter,
             backgroundColor: tickColor,
-            borderRadius: '50%',
         };
     }
 
     calculateLabelStyle({ labelFontSize }) {
         return {
-            marginLeft: '-125%', // TODO: good enough for now but not right
+            ...styles.label,
             fontSize: labelFontSize,
         };
     }
 
     onTickClick = ({ currentTarget }) => {
-        const { _onTickClick, onTickClick } = this.props;
+        const { _onTickClick } = this.props;
         const idx = parseInt(currentTarget.getAttribute('data-idx'), 10);
-
         _onTickClick(idx);
-        onTickClick(idx);
     }
 
     renderChildren() {
@@ -132,8 +119,33 @@ export default class Ticks extends PureComponent {
 }
 
 const diffProps = {
-    ticksStyle: ['_thumbDiameter', '_thumbBorderWidth', '_trackLength', '_trackPadding', 'tickDiameter'],
+    ticksStyle: [
+        '_thumbDiameter',
+        '_thumbBorderWidth',
+        '_trackLength',
+        '_trackPadding',
+        'tickDiameter',
+    ],
     tickStyle: ['tickDiameter'],
     dotStyle: ['tickDiameter', 'tickColor'],
     labelStyle: ['labelFontSize'],
+};
+
+const styles = {
+    dot: {
+        borderRadius: '50%',
+    },
+    label: {
+        marginLeft: '-125%', // TODO: good enough for now but not right
+    },
+    ticks: {
+        listStyle: 'none',
+        display: 'flex',
+        justifyContent: 'space-between',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none',
+        userSelect: 'none',
+    },
 };

@@ -1,4 +1,4 @@
-import React, { Children } from 'react';
+import React, { Children, cloneElement } from 'react';
 
 export const findChildrenByType = (children, type) => {
     const ret = [];
@@ -15,6 +15,11 @@ export const findChildByType = (children, type) => {
     const childrenByType = findChildrenByType(children, type);
     return childrenByType.slice(-1)[0] || false;
 };
+
+export function renderChildOfType(type, extraProps) {
+    const child = findChildByType(this.props.children, type);
+    return child && cloneElement(child, extraProps);
+}
 
 export const shallowDiff = (last, next, keys = []) => {
     for (let i = 0; i < keys.length; i++) {
@@ -54,3 +59,16 @@ export function calculateNextState(nextProps, diffProps, fnPrefix = 'calculate')
     });
     return nextState;
 }
+
+export const calculateNumericValue = (value, max, min) => {
+    let ret = value;
+
+    if (value === null) {
+        ret = min + ((max - min) / 2);
+    } else if (value < min) {
+        ret = min;
+    } else if (value > max) {
+        ret = max;
+    }
+    return ret;
+};
