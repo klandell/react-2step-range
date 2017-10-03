@@ -1,9 +1,7 @@
 import React, { Children, cloneElement, PureComponent } from 'react';
 import { func, object, oneOfType, shape, number } from 'prop-types';
-
-const baseCls = 'react-2step-range';
-const valueProps = ['value'];
-const styleProps = ['height', 'width'];
+import { findChildByType, calculateNextState} = './Utils';
+import { SLIDER_CLS } = './Constants';
 
 export default class Slider extends PureComponent {
     static displayName = 'Slider';
@@ -43,23 +41,9 @@ export default class Slider extends PureComponent {
     }
 
     componentWillReceiveProps(nextProps) {
-        const lastProps = this.props;
-        const newState = {};
-
-        if (this.diff(lastProps, nextProps, valueProps)) {
-            Object.assign(newState, {
-                value: nextProps.value,
-            });
-        }
-
-        if (this.diff(lastProps, nextProps, styleProps)) {
-            Object.assign(newState, {
-                style: this.calculateStyle(nextProps),
-            });
-        }
-
-        if (Object.keys(newState).length) {
-            this.setState(newState);
+        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        if (Object.keys(nextState).length) {
+            this.setState(nextState);
         }
     }
 
@@ -103,36 +87,14 @@ export default class Slider extends PureComponent {
         }));
     }
 
-    // TODO: pull this to util function
-    diff(lastProps, nextProps, keys = []) {
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            if (lastProps[key] !== nextProps[key]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    findChildrenByType(children, type) {
-        const ret = [];
-        Children.forEach(children, (child) => {
-            const childType = child && child.type && (child.type.displayName || child.type.name);
-            if (childType === type) {
-                ret.push(child);
-            }
-        });
-        return ret;
-    }
-
     renderCoarseIncrement() {
         const { children } = this.props;
         const { value } = this.state;
-        const coarseIncrement = this.findChildrenByType(children, 'CoarseIncrement');
+        const coarseIncrement = findChildByType(children, 'CoarseIncrement');
 
         let ret;
-        if (coarseIncrement.length) {
-            ret = cloneElement(coarseIncrement.slice(-1)[0], {
+        if (coarseIncrement) {
+            ret = cloneElement(coarseIncrement, {
                 _onChange: this.onCoarseIncrementChange,
                 _value: value.coarse,
             });
@@ -143,11 +105,11 @@ export default class Slider extends PureComponent {
     renderFineIncrement() {
         const { children } = this.props;
         const { value } = this.state;
-        const fineIncrement = this.findChildrenByType(children, 'FineIncrement');
+        const fineIncrement = findChildByType(children, 'FineIncrement');
 
         let ret;
-        if (fineIncrement.length) {
-            ret = cloneElement(fineIncrement.slice(-1)[0], {
+        if (fineIncrement) {
+            ret = cloneElement(fineIncrement, {
                 _onChange: this.onFineIncrementChange,
                 _value: value.fine,
             });
@@ -158,10 +120,15 @@ export default class Slider extends PureComponent {
     render() {
         const { style } = this.state;
         return (
-            <div className={baseCls} style={style}>
+            <div className={SLIDER_CLS} style={style}>
                 {this.renderCoarseIncrement()}
                 {this.renderFineIncrement()}
             </div>
         );
     }
+}
+
+const diffProps = {
+    value: ['value'],
+    style: ['height', 'width'],
 }

@@ -1,14 +1,9 @@
 import React, { Children, PureComponent } from 'react';
 import { func, number, oneOfType, shape, string } from 'prop-types';
-
-const baseCls = 'fine-increment_ticks';
+import { calculateInitialState, calculateNextState } from './Utils';
+import { TICKS_CLS } from './Constants';
 
 // TODO: allow dot to be colored based on current value
-const ticksStyleProps = ['_thumbDiameter', '_thumbBorderWidth', '_trackLength', '_trackPadding', 'tickDiameter'];
-const tickStyleProps = ['tickDiameter'];
-const dotStyleProps = ['tickDiameter', 'tickColor'];
-const labelStyleProps = ['labelFontSize'];
-
 export default class Ticks extends PureComponent {
     static displayName = 'Ticks';
 
@@ -45,58 +40,14 @@ export default class Ticks extends PureComponent {
     }
 
     componentWillMount() {
-        const { props } = this;
-
-        this.setState({
-            ticksStyle: this.calculateTicksStyle(props),
-            tickStyle: this.calculateTickStyle(props),
-            dotStyle: this.calculateDotStyle(props),
-            labelStyle: this.calculateLabelStyle(props),
-        });
+        this.setState(calculateInitialState(this.props));
     }
 
     componentWillReceiveProps(nextProps) {
-        const lastProps = this.props;
-        const newState = {};
-
-        if (this.diff(lastProps, nextProps, ticksStyleProps)) {
-            Object.assign(newState, {
-                ticksStyle: this.calculateTicksStyle(nextProps),
-            });
+        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        if (Object.keys(nextState).length) {
+            this.setState(nextState);
         }
-
-        if (this.diff(lastProps, nextProps, tickStyleProps)) {
-            Object.assign(newState, {
-                tickStyle: this.calculateTicksStyle(nextProps),
-            });
-        }
-
-        if (this.diff(lastProps, nextProps, dotStyleProps)) {
-            Object.assign(newState, {
-                dotStyle: this.calculateDotStyle(nextProps),
-            });
-        }
-
-        if (this.diff(lastProps, nextProps, labelStyleProps)) {
-            Object.assign(newState, {
-                labelStyle: this.calculateLabelStyle(nextProps),
-            });
-        }
-
-        if (Object.keys(newState).length) {
-            this.setState(newState);
-        }
-    }
-
-    // TODO: pull this to util function
-    diff(lastProps, nextProps, keys = []) {
-        for (let i = 0; i < keys.length; i++) {
-            const key = keys[i];
-            if (lastProps[key] !== nextProps[key]) {
-                return true;
-            }
-        }
-        return false;
     }
 
     calculateTicksStyle({ _thumbDiameter, _thumbBorderWidth, _trackLength, _trackPadding, tickDiameter }) {
@@ -153,7 +104,7 @@ export default class Ticks extends PureComponent {
 
         return Children.map(children, (child, i) => (
             <li
-              className={`${baseCls}_tick`}
+              className={`${TICKS_CLS}_tick`}
               style={tickStyle}
             >
                 <div
@@ -173,9 +124,16 @@ export default class Ticks extends PureComponent {
     render() {
         const { ticksStyle } = this.state;
         return (
-            <ul className={baseCls} style={ticksStyle}>
+            <ul className={TICKS_CLS} style={ticksStyle}>
                 {this.renderChildren()}
             </ul>
         );
     }
+}
+
+const diffProps = {
+    ticksStyle: ['_thumbDiameter', '_thumbBorderWidth', '_trackLength', '_trackPadding', 'tickDiameter'],
+    tickStyle: ['tickDiameter'],
+    dotStyle: ['tickDiameter', 'tickColor'],
+    labelStyle: ['labelFontSize'],
 }
