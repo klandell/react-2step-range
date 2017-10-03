@@ -31,11 +31,11 @@ export default class Icon extends PureComponent {
     }
 
     componentWillMount() {
-        this.setState(calculateInitialState(this.props));
+        this.setState(calculateInitialState.call(this, diffProps));
     }
 
     componentWillReceiveProps(nextProps) {
-        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        const nextState = calculateNextState.call(this, nextProps, diffProps);
         if (Object.keys(nextState).length) {
             this.setState(nextState);
         }
@@ -80,8 +80,8 @@ const styles = {
         MozUserSelect: 'none',
         msUserSelect: 'none',
         userSelect: 'none',
-    }
-}
+    },
+};
 
 const diffProps = {
     style: ['style'],

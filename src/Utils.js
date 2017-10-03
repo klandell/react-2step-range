@@ -9,14 +9,14 @@ export const findChildrenByType = (children, type) => {
         }
     });
     return ret;
-}
+};
 
 export const findChildByType = (children, type) => {
     const childrenByType = findChildrenByType(children, type);
     return childrenByType.slice(-1)[0] || false;
-}
+};
 
-export const shallowDiff(last, next, keys = []) => {
+export const shallowDiff = (last, next, keys = []) => {
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
         if (last[key] !== next[key]) {
@@ -24,26 +24,31 @@ export const shallowDiff(last, next, keys = []) => {
         }
     }
     return false;
-}
+};
 
-export const calculateInitialState = function(props, diffProps, fnPrefix = 'calculate') {
+export const capitalize = (str) => {
+    const words = str.split(' ');
+    return words.map(w => `${w.substr(0, 1).toUpperCase()}${w.slice(1)}`).join(' ');
+};
+
+export function calculateInitialState(diffProps, fnPrefix = 'calculate') {
     const initialState = {};
 
     Object.keys(diffProps).forEach((k) => {
         Object.assign(initialState, {
-            [k]: this[`${fnPrefix}${k.toUpperCase()}`](props)
-        })
+            [k]: this[`${fnPrefix}${capitalize(k)}`](this.props),
+        });
     });
     return initialState;
 }
 
-export const calculateNextState = function(lastProps, nextProps, diffProps, fnPrefix = 'calculate') {
+export function calculateNextState(nextProps, diffProps, fnPrefix = 'calculate') {
     const nextState = {};
 
     Object.keys(diffProps).forEach((k) => {
-        if (shallowDiff(lastProps, nextProps, diffProps[k])) {
-            Object.assign(newState, {
-                [k]: this[`${fnPrefix}${k.toUpperCase()}`](nextProps),
+        if (shallowDiff(this.props, nextProps, diffProps[k])) {
+            Object.assign(nextState, {
+                [k]: this[`${fnPrefix}${capitalize(k)}`](nextProps),
             });
         }
     });

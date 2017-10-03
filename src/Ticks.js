@@ -40,11 +40,11 @@ export default class Ticks extends PureComponent {
     }
 
     componentWillMount() {
-        this.setState(calculateInitialState(this.props));
+        this.setState(calculateInitialState.call(this, diffProps));
     }
 
     componentWillReceiveProps(nextProps) {
-        const nextState = calculateNextState(this.props, nextProps, diffProps);
+        const nextState = calculateNextState.call(this, nextProps, diffProps);
         if (Object.keys(nextState).length) {
             this.setState(nextState);
         }
@@ -136,4 +136,4 @@ const diffProps = {
     tickStyle: ['tickDiameter'],
     dotStyle: ['tickDiameter', 'tickColor'],
     labelStyle: ['labelFontSize'],
-}
+};

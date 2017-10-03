@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import { func, number, object, string } from 'prop-types';
+import Icon from './Icon';
 import { MINUS_ICON_CLS } from './Constants';
 
 export default class MinusIcon extends PureComponent {
