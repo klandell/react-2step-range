@@ -241,8 +241,8 @@ export default class FineIncrement extends PureComponent {
 
   calculateValues({ max, min, step }) {
     return new Array(Math.floor(((max - min) + step) / step))
-          .fill()
-          .map((d, i) => (i * step) + min);
+      .fill()
+      .map((d, i) => (i * step) + min);
   }
 
   calculatePositionFromValue(props, stops, value) {

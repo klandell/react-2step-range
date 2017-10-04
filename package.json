@@ -33,9 +33,10 @@
   },
   "scripts": {
     "check-dependencies": "ncu",
+    "cover": "codecov",
+    "lint": "eslint src/**",
     "prepare": "babel ./src --out-dir ./dist",
-    "test": "jest --coverage",
-    "cover": "codecov"
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",

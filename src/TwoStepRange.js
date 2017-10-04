@@ -49,8 +49,8 @@ export default class TwoStepRange extends PureComponent {
     const nextPropsVal = nextProps.value;
 
     if (
-        (value.coarse !== nextStateVal.coarse && nextStateVal.coarse !== nextPropsVal.coarse) ||
-        (value.fine !== nextStateVal.fine && nextStateVal.fine !== nextPropsVal.fine)
+      (value.coarse !== nextStateVal.coarse && nextStateVal.coarse !== nextPropsVal.coarse) ||
+      (value.fine !== nextStateVal.fine && nextStateVal.fine !== nextPropsVal.fine)
     ) {
       nextProps.onChange(nextStateVal);
     }
