@@ -388,6 +388,7 @@ const styles = {
         alignItems: 'center',
         flexShrink: 0,
         outline: 'none',
+        zIndex: 1,
     },
     track: {
         boxSizing: 'border-box',

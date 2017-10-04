@@ -3,6 +3,8 @@ import { func, number, oneOfType, shape, string } from 'prop-types';
 import { calculateInitialState, calculateNextState } from './Utils';
 import { TICKS_CLS } from './Constants';
 
+// TODO: use array instead of children for building ticks
+
 export default class Ticks extends PureComponent {
     static displayName = 'Ticks';
 
@@ -74,17 +76,18 @@ export default class Ticks extends PureComponent {
         };
     }
 
-    calculateLabelStyle({ labelFontSize }) {
+    calculateLabelStyle({ labelFontSize, tickDiameter }) {
         return {
             ...styles.label,
             fontSize: labelFontSize,
+            transform: `translateX(calc(${Math.ceil(tickDiameter / 2)}px - 50%))`,
         };
     }
 
     onTickClick = ({ currentTarget }) => {
-        const { _onTickClick } = this.props;
+        const { children, _onTickClick } = this.props;
         const idx = parseInt(currentTarget.getAttribute('data-idx'), 10);
-        _onTickClick(idx);
+        _onTickClick(idx, children.length);
     }
 
     renderChildren() {
@@ -151,12 +154,14 @@ const styles = {
         borderRadius: '50%',
     },
     label: {
-        marginLeft: '-125%', // TODO: good enough for now but not right
+        position: 'absolute',
         outline: 'none',
+        marginTop: 2,
     },
     ticks: {
         listStyle: 'none',
         display: 'flex',
         justifyContent: 'space-between',
+        position: 'relative',
     },
 };
