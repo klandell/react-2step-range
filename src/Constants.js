@@ -1,6 +1,6 @@
-export const COARSE_INCREMENT_CLS = 'coarse-increment';
-export const FINE_INCREMENT_CLS = 'fine-increment';
-export const MINUS_ICON_CLS = 'minus-icon';
-export const PLUS_ICON_CLS = 'plus-icon';
-export const SLIDER_CLS = 'react-2step-range';
-export const TICKS_CLS = 'fine-increment-ticks';
+export const TWO_STEP_RANGE_CLS = 'r2sr';
+export const COARSE_INCREMENT_CLS = `${TWO_STEP_RANGE_CLS}_coarse-increment`;
+export const FINE_INCREMENT_CLS = `${TWO_STEP_RANGE_CLS}_fine-increment`;
+export const MINUS_ICON_CLS = `${TWO_STEP_RANGE_CLS}_minus-icon`;
+export const PLUS_ICON_CLS = `${TWO_STEP_RANGE_CLS}_plus-icon`;
+export const TICKS_CLS = `${TWO_STEP_RANGE_CLS}_ticks`;

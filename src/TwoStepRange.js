@@ -1,10 +1,10 @@
 import React, { PureComponent } from 'react';
 import { func, object, oneOfType, shape, number } from 'prop-types';
 import { calculateInitialState, calculateNextState, renderChildOfType } from './Utils';
-import { SLIDER_CLS } from './Constants';
+import { TWO_STEP_RANGE_CLS } from './Constants';
 
-export default class Slider extends PureComponent {
-    static displayName = 'Slider';
+export default class TwoStepRange extends PureComponent {
+    static displayName = 'TwoStepRange';
 
     static propTypes = {
         height: number.isRequired,
@@ -43,7 +43,6 @@ export default class Slider extends PureComponent {
         }
     }
 
-    // TODO: clean this up
     componentWillUpdate(nextProps, nextState) {
         const { value } = this.state;
 
@@ -69,7 +68,7 @@ export default class Slider extends PureComponent {
 
     calculateStyle({ height, width, style }) {
         return {
-            ...styles.slider,
+            ...styles.twoStepRange,
             height,
             width,
             ...style,
@@ -99,7 +98,7 @@ export default class Slider extends PureComponent {
     render() {
         const { style } = this.state;
         return (
-            <div className={SLIDER_CLS} style={style}>
+            <div className={TWO_STEP_RANGE_CLS} style={style}>
                 {this.renderCoarseIncrement()}
                 {this.renderFineIncrement()}
             </div>
@@ -113,7 +112,7 @@ const diffProps = {
 };
 
 const styles = {
-    slider: {
+    twoStepRange: {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
