@@ -9,6 +9,8 @@ import {
 } from './Utils';
 import { FINE_INCREMENT_CLS } from './Constants';
 
+// TODO: fix issue where I can increment past the highest possible number when max is not a multiple of step
+
 export default class FineIncrement extends PureComponent {
     static displayName = 'FineIncrement';
 
@@ -211,7 +213,7 @@ export default class FineIncrement extends PureComponent {
     }
 
     calculateValues({ max, min, step }) {
-        return new Array(Math.floor(((max - min) + 1) / step))
+        return new Array(Math.floor(((max - min) + step) / step))
           .fill()
           .map((d, i) => (i * step) + min);
     }
