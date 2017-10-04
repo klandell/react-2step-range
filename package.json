@@ -3,18 +3,24 @@
   "version": "0.0.6",
   "description": "A highly customizable replacement for the HTML range input with two levels of adjustment granularity",
   "main": "dist/index.js",
-  "dependencies": {
-    "prop-types": "^15.6.0",
-    "react": "^16.0.0"
+  "peerDependencies": {
+    "prop-types": "^15.x",
+    "react": "^15.x || ^16.x"
   },
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.1",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1"
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^3.19.0 || ^4.3.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.1.0"
   },
   "scripts": {
     "prepare": "babel ./src --out-dir ./dist",
