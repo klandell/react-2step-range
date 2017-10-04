@@ -69,6 +69,13 @@ export default class FineIncrement extends PureComponent {
         this.setState(calculateInitialState.call(this, diffProps));
     }
 
+    componentDidMount() {
+        document.addEventListener('mousemove', this.onMouseMove, this);
+        document.addEventListener('mouseup', this.onMouseUpTouchEnd, this);
+        document.addEventListener('touchmove', this.onTouchMove, this);
+        document.addEventListener('touchend', this.onMouseUpTouchEnd, this);
+    }
+
     componentWillReceiveProps(nextProps) {
         const nextState = calculateNextState.call(this, nextProps, diffProps);
         if (Object.keys(nextState).length) {
@@ -83,11 +90,15 @@ export default class FineIncrement extends PureComponent {
         }
     }
 
-    onThumbContainerClick = ({ clientX, currentTarget }) => {
-        const clickLocation = (clientX - currentTarget.getBoundingClientRect().left);
-        this.setState(state => ({
-            value: this.calculateValueFromPosition(state, clickLocation),
-        }));
+    componentWillUnmount() {
+        document.removeEventListener('mousemove', this.onMouseMove, this);
+        document.removeEventListener('mouseup', this.onMouseUpTouchEnd, this);
+        document.removeEventListener('touchmove', this.onTouchMove, this);
+        document.removeEventListener('touchend', this.onMouseUpTouchEnd, this);
+    }
+
+    onThumbContainerClick = ({ clientX }) => {
+        this.updateValueOnSlide(clientX);
     }
 
     onThumbContainerMouseDown = ({ button }) => {
@@ -100,27 +111,21 @@ export default class FineIncrement extends PureComponent {
         this.isSlidable = true;
     }
 
-    onThumbContainerMouseUpTouchEnd = () => {
-        this.isSlidable = false;
+    onMouseUpTouchEnd = () => {
+        if (this.isSlidable) {
+            this.isSlidable = false;
+        }
     }
 
     onMouseMove = ({ clientX }) => {
-        // TODO: move this event to the window instead?
         if (this.isSlidable) {
-            const mouseLocation = clientX - this.thumbContainer.getBoundingClientRect().left;
-            this.setState(state => ({
-                value: this.calculateValueFromPosition(state, mouseLocation),
-            }));
+            this.updateValueOnSlide(clientX);
         }
     }
 
     onTouchMove = ({ touches }) => {
-        // TODO: move this event to the window instead?
         if (this.isSlidable && (typeof touches !== 'undefined')) {
-            const touchLocation = touches[0].clientX - this.thumbContainer.getBoundingClientRect().left;
-            this.setState(state => ({
-                value: this.calculateValueFromPosition(state, touchLocation),
-            }));
+            this.updateValueOnSlide(touches[0].clientX);
         }
     }
 
@@ -140,6 +145,13 @@ export default class FineIncrement extends PureComponent {
     onPlusIconClick = () => {
         this.setState((state, props) => ({
             value: Math.min(props.max, state.value + props.step),
+        }));
+    }
+
+    updateValueOnSlide(xPos) {
+        const loc = xPos - this.thumbContainer.getBoundingClientRect().left;
+        this.setState(state => ({
+            value: this.calculateValueFromPosition(state, loc),
         }));
     }
 
@@ -283,8 +295,6 @@ export default class FineIncrement extends PureComponent {
             <div
               className={`${FINE_INCREMENT_CLS}`}
               style={styles.fineIncrement}
-              onMouseMove={this.onMouseMove}
-              onTouchMove={this.onTouchMove}
             >
                 {this.renderMinusIcon()}
                 <div style={trackContainerStyle}>
@@ -298,8 +308,6 @@ export default class FineIncrement extends PureComponent {
                       onClick={this.onThumbContainerClick}
                       onMouseDown={this.onThumbContainerMouseDown}
                       onTouchStart={this.onThumbContainerTouchStart}
-                      onTouchEnd={this.onThumbContainerMouseUpTouchEnd}
-                      onMouseUp={this.onThumbContainerMouseUpTouchEnd}
                       ref={(c) => { this.thumbContainer = c; }}
                       role="slider"
                       aria-valuemax={max}
