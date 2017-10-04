@@ -1,11 +1,5 @@
 language: node_js
 node_js:
   - "node"
-  - "8"
-  - "7"
-  - "6"
-os:
-  - linux
-  - osx
 cache: yarn
 script: yarn test && yarn cover
