@@ -59,15 +59,19 @@ export default class CoarseIncrement extends PureComponent {
 
     onMinusIconClick = () => {
         this.setState((state, props) => {
-            const value = Math.max(props.min, state.value - props.step);
-            return { value };
+            const newValue = state.value - props.step;
+            return {
+                value: newValue >= props.min ? newValue : state.value,
+            };
         });
     }
 
     onPlusIconClick = () => {
         this.setState((state, props) => {
-            const value = Math.min(props.max, state.value + props.step);
-            return { value };
+            const newValue = state.value + props.step;
+            return {
+                value: newValue <= props.max ? newValue : state.value,
+            };
         });
     }
 
@@ -117,5 +121,6 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        cursor: 'default',
     },
 };
