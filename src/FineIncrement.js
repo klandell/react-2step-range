@@ -9,8 +9,6 @@ import {
 } from './Utils';
 import { FINE_INCREMENT_CLS } from './Constants';
 
-// TODO: fix issue where I can increment past the highest possible number when max is not a multiple of step
-
 export default class FineIncrement extends PureComponent {
     static displayName = 'FineIncrement';
 
@@ -143,9 +141,12 @@ export default class FineIncrement extends PureComponent {
     }
 
     onPlusIconClick = () => {
-        this.setState((state, props) => ({
-            value: Math.min(props.max, state.value + props.step),
-        }));
+        this.setState((state, props) => {
+            const functionalMax = state.values.slice(-1)[0];
+            return {
+                value: Math.min(functionalMax, state.value + props.step),
+            };
+        });
     }
 
     updateValueOnSlide(xPos) {
@@ -220,8 +221,15 @@ export default class FineIncrement extends PureComponent {
         return stops;
     }
 
-    calculateValue({ _value, max, min }) {
-        return calculateNumericValue(_value, max, min);
+    calculateValue(props) {
+        const { _value, min } = props;
+        const functionalMax = this.calculateValues(props).slice(-1)[0];
+        const val = calculateNumericValue(_value, functionalMax, min);
+
+        if (val !== _value) {
+            props._onChange(val);
+        }
+        return val;
     }
 
     calculateValues({ max, min, step }) {
