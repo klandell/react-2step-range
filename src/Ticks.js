@@ -1,9 +1,7 @@
-import React, { Children, PureComponent } from 'react';
-import { func, number, oneOfType, shape, string } from 'prop-types';
+import React, { PureComponent } from 'react';
+import { array, func, number, oneOfType, shape, string } from 'prop-types';
 import { calculateInitialState, calculateNextState } from './Utils';
 import { TICKS_CLS } from './Constants';
-
-// TODO: use array instead of children for building ticks
 
 export default class Ticks extends PureComponent {
     static displayName = 'Ticks';
@@ -21,6 +19,7 @@ export default class Ticks extends PureComponent {
             right: number,
         }).isRequired,
         labelFontSize: oneOfType([number, string]),
+        labels: array.isRequired,
         tickColor: string,
         tickDiameter: number,
     }
@@ -85,18 +84,18 @@ export default class Ticks extends PureComponent {
     }
 
     onTickClick = ({ currentTarget }) => {
-        const { children, _onTickClick } = this.props;
+        const { labels, _onTickClick } = this.props;
         const idx = parseInt(currentTarget.getAttribute('data-idx'), 10);
-        _onTickClick(idx, children.length);
+        _onTickClick(idx, labels.length);
     }
 
-    renderChildren() {
-        const { children, _activeTrackColor, _pctFill } = this.props;
+    renderLabels() {
+        const { labels, _activeTrackColor, _pctFill } = this.props;
         const { tickStyle, dotStyle, labelStyle } = this.state;
-        const childCount = children.length;
+        const labelCount = labels.length;
 
-        return Children.map(children, (child, i) => {
-            const isActive = _pctFill >= (i / (childCount - 1));
+        return labels.map((label, i) => {
+            const isActive = _pctFill >= (i / (labelCount - 1));
 
             let currentDotStyle;
             if (isActive) {
@@ -109,6 +108,7 @@ export default class Ticks extends PureComponent {
                 <li
                   className={`${TICKS_CLS}_tick`}
                   style={tickStyle}
+                  key={label.key || i}
                 >
                     <div
                       style={currentDotStyle}
@@ -120,7 +120,7 @@ export default class Ticks extends PureComponent {
                       style={labelStyle}
                       role="button"
                       tabIndex="0"
-                    >{child}</span>
+                    >{label}</span>
                 </li>
             );
         });
@@ -130,7 +130,7 @@ export default class Ticks extends PureComponent {
         const { ticksStyle } = this.state;
         return (
             <ul className={TICKS_CLS} style={ticksStyle}>
-                {this.renderChildren()}
+                {this.renderLabels()}
             </ul>
         );
     }
