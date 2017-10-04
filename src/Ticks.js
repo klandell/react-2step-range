@@ -3,14 +3,16 @@ import { func, number, oneOfType, shape, string } from 'prop-types';
 import { calculateInitialState, calculateNextState } from './Utils';
 import { TICKS_CLS } from './Constants';
 
-// TODO: allow dot to be colored based on current value
 export default class Ticks extends PureComponent {
     static displayName = 'Ticks';
 
     static propsTypes = {
         _onTickClick: func.isRequired,
+        _activeTrackColor: string.isRequired,
+        _pctFill: number.isRequired,
         _thumbBorderWidth: number.isRequired,
         _thumbDiameter: number.isRequired,
+        _trackColor: string.isRequired,
         _trackLength: number.isRequired,
         _trackPadding: shape({
             left: number,
@@ -23,7 +25,7 @@ export default class Ticks extends PureComponent {
 
     static defaultProps = {
         labelFontSize: 12,
-        tickColor: '#000',
+        tickColor: null,
         tickDiameter: 7,
     }
 
@@ -63,12 +65,12 @@ export default class Ticks extends PureComponent {
         return { width: tickDiameter };
     }
 
-    calculateDotStyle({ tickDiameter, tickColor }) {
+    calculateDotStyle({ tickDiameter, tickColor, _trackColor }) {
         return {
             ...styles.dot,
             height: tickDiameter,
             width: tickDiameter,
-            backgroundColor: tickColor,
+            backgroundColor: tickColor || _trackColor,
         };
     }
 
@@ -86,26 +88,39 @@ export default class Ticks extends PureComponent {
     }
 
     renderChildren() {
-        const { children } = this.props;
+        const { children, _activeTrackColor, _pctFill } = this.props;
         const { tickStyle, dotStyle, labelStyle } = this.state;
+        const childCount = children.length;
 
-        return Children.map(children, (child, i) => (
-            <li
-              className={`${TICKS_CLS}_tick`}
-              style={tickStyle}
-            >
-                <div
-                  style={dotStyle}
-                  data-idx={i}
-                  onClick={this.onTickClick}
-                />
-                <span
-                  onClick={this.onTickClick}
-                  data-idx={i}
-                  style={labelStyle}
-                >{child}</span>
-            </li>
-        ));
+        return Children.map(children, (child, i) => {
+            const isActive = _pctFill >= (i / (childCount - 1));
+
+            let currentDotStyle;
+            if (isActive) {
+                currentDotStyle = { ...dotStyle, backgroundColor: _activeTrackColor };
+            } else {
+                currentDotStyle = dotStyle;
+            }
+
+            return (
+                <li
+                  className={`${TICKS_CLS}_tick`}
+                  style={tickStyle}
+                >
+                    <div
+                      style={currentDotStyle}
+                      data-idx={i}
+                    />
+                    <span
+                      onClick={this.onTickClick}
+                      data-idx={i}
+                      style={labelStyle}
+                      role="button"
+                      tabIndex="0"
+                    >{child}</span>
+                </li>
+            );
+        });
     }
 
     render() {
@@ -137,6 +152,7 @@ const styles = {
     },
     label: {
         marginLeft: '-125%', // TODO: good enough for now but not right
+        outline: 'none',
     },
     ticks: {
         listStyle: 'none',

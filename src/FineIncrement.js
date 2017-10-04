@@ -82,7 +82,6 @@ export default class FineIncrement extends PureComponent {
     }
 
     onThumbContainerClick = ({ clientX, currentTarget }) => {
-        // TODO: break this into a function too!!
         const clickLocation = (clientX - currentTarget.getBoundingClientRect().left);
         this.setState(state => ({
             value: this.calculateValueFromPosition(state, clickLocation),
@@ -104,7 +103,6 @@ export default class FineIncrement extends PureComponent {
     }
 
     onMouseMove = ({ clientX }) => {
-        // TODO: combine with onThumbContainerClick fn and onTouchMove
         // TODO: move this event to the window instead?
         if (this.isSlidable) {
             const mouseLocation = clientX - this.thumbContainer.getBoundingClientRect().left;
@@ -115,7 +113,6 @@ export default class FineIncrement extends PureComponent {
     }
 
     onTouchMove = ({ touches }) => {
-        // TODO: combine with onThumbContainerClick fn?
         // TODO: move this event to the window instead?
         if (this.isSlidable && (typeof touches !== 'undefined')) {
             const touchLocation = touches[0].clientX - this.thumbContainer.getBoundingClientRect().left;
@@ -242,11 +239,25 @@ export default class FineIncrement extends PureComponent {
     }
 
     renderTicks() {
-        const { thumbBorderWidth, thumbDiameter, trackPadding, trackLength } = this.props;
+        const {
+            activeTrackColor,
+            max,
+            min,
+            thumbBorderWidth,
+            thumbDiameter,
+            trackColor,
+            trackPadding,
+            trackLength,
+        } = this.props;
+        const { value } = this.state;
+
         return renderChildOfType.call(this, 'Ticks', {
             _onTickClick: this.onTickClick,
+            _activeTrackColor: activeTrackColor || trackColor,
+            _pctFill: (1 / ((max + min) / value)) || 0,
             _thumbBorderWidth: thumbBorderWidth,
             _thumbDiameter: thumbDiameter,
+            _trackColor: trackColor,
             _trackPadding: trackPadding,
             _trackLength: trackLength,
         });
@@ -254,11 +265,16 @@ export default class FineIncrement extends PureComponent {
 
     render() {
         const {
-          trackContainerStyle,
-          activeTrackStyle,
-          trackStyle,
-          thumbContainerStyle,
-          thumbStyle,
+            _value,
+            max,
+            min,
+        } = this.props;
+        const {
+            trackContainerStyle,
+            activeTrackStyle,
+            trackStyle,
+            thumbContainerStyle,
+            thumbStyle,
         } = this.state;
 
         return (
@@ -283,6 +299,11 @@ export default class FineIncrement extends PureComponent {
                       onTouchEnd={this.onThumbContainerMouseUpTouchEnd}
                       onMouseUp={this.onThumbContainerMouseUpTouchEnd}
                       ref={(c) => { this.thumbContainer = c; }}
+                      role="slider"
+                      aria-valuemax={max}
+                      aria-valuemin={min}
+                      aria-valuenow={_value}
+                      tabIndex="0"
                     >
                         <div
                           className={`${FINE_INCREMENT_CLS}_active-track`}
@@ -341,6 +362,7 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         flexShrink: 0,
+        outline: 'none',
     },
     track: {
         boxSizing: 'border-box',
