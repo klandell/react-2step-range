@@ -74,11 +74,6 @@ const styles = {
         padding: 0,
         margin: 0,
         cursor: 'pointer',
-        WebkitTouchCallout: 'none',
-        WebkitUserSelect: 'none',
-        MozUserSelect: 'none',
-        msUserSelect: 'none',
-        userSelect: 'none',
     },
 };
 

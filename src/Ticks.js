@@ -158,10 +158,5 @@ const styles = {
         listStyle: 'none',
         display: 'flex',
         justifyContent: 'space-between',
-        WebkitTouchCallout: 'none',
-        WebkitUserSelect: 'none',
-        MozUserSelect: 'none',
-        msUserSelect: 'none',
-        userSelect: 'none',
     },
 };

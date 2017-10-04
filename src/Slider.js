@@ -117,5 +117,10 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none',
+        userSelect: 'none',
     },
 };
