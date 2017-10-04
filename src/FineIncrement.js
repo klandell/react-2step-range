@@ -9,6 +9,8 @@ import {
 } from './Utils';
 import { FINE_INCREMENT_CLS } from './Constants';
 
+// TODO: BUG with negative min
+
 export default class FineIncrement extends PureComponent {
     static displayName = 'FineIncrement';
 
@@ -127,11 +129,16 @@ export default class FineIncrement extends PureComponent {
         }
     }
 
-    onTickClick = (idx) => {
-        // TODO: this shouldn't actually use IDX, doesn't work if less ticks than values
-        this.setState(state => ({
-            value: state.values[idx],
-        }));
+    onTickClick = (idx, tickCount) => {
+        this.setState((state, props) => {
+            const { min } = props;
+            const { values } = state;
+            const functionalMax = values.slice(-1)[0];
+            const guess = (functionalMax - min) * (idx / (tickCount - 1));
+            return {
+                value: values[findClosestIdx(values, guess)],
+            };
+        });
     }
 
     onMinusIconClick = () => {
