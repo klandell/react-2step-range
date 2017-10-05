@@ -12,7 +12,7 @@ export default class CoarseIncrement extends PureComponent {
   static displayName = 'CoarseIncrement';
 
   static propTypes = {
-      _onChange: func,
+    _onChange: func,
     _value: number,
     max: number,
     min: number,

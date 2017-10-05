@@ -12,6 +12,7 @@
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-core": "^7.0.0-beta.2",
     "babel-eslint": "^8.0.1",
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
@@ -26,25 +27,25 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsx-a11y": "^5.1.1",
     "eslint-plugin-react": "^7.1.0",
+    "husky": "^0.14.3",
     "jest": "^21.2.1",
     "jest-cli": "^21.2.1",
     "npm-check-updates": "^2.13.0",
-    "pre-commit": "^1.2.2",
-    "pre-push": "^0.1.1",
     "prop-types": "^15.6.0",
-    "react": "^16.0.0"
+    "react": "^16.0.0",
+    "yarn": "^1.1.0"
   },
   "scripts": {
     "check-dependencies": "ncu",
     "cover": "codecov",
     "lint": "eslint src/**",
-    "lint:fix": "yarn lint -- --fix",
+    "lint:fix": "yarn lint --fix",
     "prepare": "babel ./src --out-dir ./dist",
-    "test": "jest --coverage"
+    "precommit": "yarn lint && yarn test:lite",
+    "prepush": "yarn lint && yarn test",
+    "test": "jest",
+    "test:lite": "jest --onlyChanged"
   },
-  "pre-commit": [
-    "lint"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/klandell/react-2step-range.git"
