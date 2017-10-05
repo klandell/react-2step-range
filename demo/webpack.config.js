@@ -9,7 +9,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      '@src': path.join(__dirname, '../src'),
+      'react-2step-range': path.join(__dirname, '../src'),
     },
   },
   module: {

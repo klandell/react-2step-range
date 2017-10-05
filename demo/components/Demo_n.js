@@ -6,7 +6,7 @@ import {
   PlusIcon,
   Ticks,
   TwoStepRange,
-} from '@src';
+} from 'react-2step-range';
 
 export default class Demo2 extends PureComponent {
   constructor(props) {

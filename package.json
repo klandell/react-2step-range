@@ -29,6 +29,8 @@
     "jest": "^21.2.1",
     "jest-cli": "^21.2.1",
     "npm-check-updates": "^2.13.0",
+    "pre-commit": "^1.2.2",
+    "pre-push": "^0.1.1",
     "prop-types": "^15.6.0",
     "react": "^16.0.0"
   },
@@ -36,9 +38,13 @@
     "check-dependencies": "ncu",
     "cover": "codecov",
     "lint": "eslint src/**",
+    "lint:fix": "yarn lint -- --fix",
     "prepare": "babel ./src --out-dir ./dist",
     "test": "jest --coverage"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/klandell/react-2step-range.git"
@@ -49,6 +55,7 @@
   "homepage": "https://github.com/klandell/react-2step-range#readme",
   "files": [
     "src/",
-    "dist/"
+    "dist/",
+    "demo/"
   ]
 }

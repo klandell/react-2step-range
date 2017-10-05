@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import {
   FineIncrement,
   TwoStepRange,
-} from '@src';
+} from 'react-2step-range';
 
 export default class Demo1 extends PureComponent {
   constructor(props) {
