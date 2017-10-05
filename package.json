@@ -44,7 +44,6 @@
     "precommit": "yarn lint && yarn test:lite",
     "prepush": "yarn lint && yarn test",
     "test": "jest",
-    "test:hack": "yarn -v && yarn test",
     "test:lite": "jest --onlyChanged"
   },
   "repository": {
