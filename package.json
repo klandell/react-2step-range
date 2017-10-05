@@ -3,6 +3,8 @@
   "version": "0.0.6",
   "description": "A highly customizable replacement for the HTML range input with two levels of adjustment granularity",
   "main": "dist/index.js",
+  "author": "Kyle Landell <kyle.landell@gmail.com>",
+  "license": "MIT",
   "peerDependencies": {
     "prop-types": "^15.x",
     "react": "^15.x || ^16.x"
@@ -13,7 +15,6 @@
     "babel-eslint": "^8.0.1",
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
@@ -42,8 +43,6 @@
     "type": "git",
     "url": "git+https://github.com/klandell/react-2step-range.git"
   },
-  "author": "Kyle Landell <kyle.landell@gmail.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/klandell/react-2step-range/issues"
   },
