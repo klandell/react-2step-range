@@ -5,4 +5,4 @@ node_js:
   - "7"
   - "6"
 cache: yarn
-script: yarn lint && yarn test && yarn cover
+script: yarn lint && yarn test:hack && yarn cover
