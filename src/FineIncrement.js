@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { func, number, shape, string } from 'prop-types';
+import { bool, func, number, shape, string } from 'prop-types';
 import {
   calculateInitialState,
   calculateNextState,
@@ -26,6 +26,7 @@ export default class FineIncrement extends PureComponent {
     thumbBorderWidth: number,
     thumbColor: string,
     thumbDiameter: number,
+    thumbOverhang: bool,
     trackColor: string,
     trackLength: number.isRequired,
     trackPadding: shape({
@@ -41,10 +42,11 @@ export default class FineIncrement extends PureComponent {
     activeTrackColor: null,
     onChange: () => {},
     step: 1,
-    thumbBorderColor: '#000',
+    thumbBorderColor: 'transparent',
     thumbBorderWidth: 0,
     thumbColor: '#000',
     thumbDiameter: 11,
+    thumbOverhang: true,
     trackColor: '#000',
     trackPadding: { left: 0, right: 0 },
     trackWidth: 1,
@@ -168,22 +170,31 @@ export default class FineIncrement extends PureComponent {
   }
 
   calculateActiveTrackStyle(props) {
-    const { activeTrackColor, trackColor, trackWidth, trackPadding } = props;
+    const { activeTrackColor, thumbOverhang, trackColor, trackWidth, trackPadding } = props;
     const value = this.calculateValue(props);
     const stops = this.calculateStops(props);
     const position = this.calculatePositionFromValue(props, stops, value);
+    const positionIdx = stops.indexOf(position);
 
-    return {
+    const style = {
       ...styles.activeTrack,
       width: position - trackPadding.left,
-      backgroundColor: activeTrackColor || trackColor,
+      backgroundColor: positionIdx !== 0 ? (activeTrackColor || trackColor) : 'transparent',
       height: trackWidth,
       marginLeft: trackPadding.left,
     };
+
+    if (!thumbOverhang) {
+      Object.assign(style, {
+        borderTopLeftRadius: trackWidth,
+        borderBottomLeftRadius: trackWidth,
+      });
+    }
+    return style;
   }
 
-  calculateTrackStyle({ trackLength, trackWidth, trackColor, trackPadding }) {
-    return {
+  calculateTrackStyle({ trackLength, thumbOverhang, trackWidth, trackColor, trackPadding }) {
+    const style = {
       ...styles.track,
       width: trackLength,
       height: trackWidth,
@@ -191,12 +202,19 @@ export default class FineIncrement extends PureComponent {
       paddingLeft: trackPadding.left,
       paddingRight: trackPadding.right,
     };
+
+    if (!thumbOverhang) {
+      Object.assign(style, {
+        borderRadius: trackWidth,
+      });
+    }
+    return style;
   }
 
-  calculateThumbContainerStyle({ thumbDiameter, thumbBorderWidth }) {
+  calculateThumbContainerStyle({ thumbDiameter, thumbBorderWidth, trackWidth }) {
     return {
       ...styles.thumbContainer,
-      bottom: Math.ceil((thumbDiameter + (thumbBorderWidth * 2)) / 2),
+      bottom: Math.ceil((thumbDiameter + (thumbBorderWidth * 2)) / 2) + Math.floor(trackWidth / 2),
     };
   }
 
@@ -211,14 +229,30 @@ export default class FineIncrement extends PureComponent {
     };
   }
 
-  calculateStops({ max, min, step, trackLength, trackPadding }) {
+  calculateStops({
+    max,
+    min,
+    step,
+    trackLength,
+    trackPadding,
+    thumbDiameter,
+    thumbBorderWidth,
+    thumbOverhang,
+  }) {
     const { left, right } = trackPadding;
 
-    const usableTrack = trackLength - left - right;
+    let usableTrack = trackLength - left - right;
+    if (!thumbOverhang) {
+      usableTrack -= thumbDiameter + (2 * thumbBorderWidth);
+    }
+
     const stepCount = (max - min) / step;
     const realStep = usableTrack / stepCount;
 
     let previousStop = left;
+    if (!thumbOverhang) {
+      previousStop += Math.ceil(thumbDiameter / 2) + thumbBorderWidth;
+    }
     const stops = [previousStop];
 
     for (let i = 1; i <= stepCount; i++) {
